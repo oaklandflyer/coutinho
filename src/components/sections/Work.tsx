@@ -1,62 +1,43 @@
 "use client";
 import { useRef, useEffect } from "react";
 
-const projects = [
+const asfStats = [
+  { n: "3+", l: "Years Active" },
+  { n: "10+", l: "Clients Served" },
+  { n: "D1", l: "Athletics" },
+  { n: "FAA", l: "Part 107" },
+];
+
+const clients = [
   {
-    n: "00",
-    category: "Creative Agency · Founded",
-    title: "ASF Visuals LLC",
-    body: "Photo · Video · Drone · Web · SEO. Certified drone media business serving D1 Athletics, CRE firms, and civic organizations. FAA Part 107 licensed.",
-    href: "https://asfvisualsllc.com",
-    featured: true,
-  },
-  {
-    n: "01",
     category: "Sports Photography & Drone",
     title: "University of Pittsburgh D1 Athletics",
-    body: "On-field photography and drone videography for Pitt Men's & Women's Soccer. Game-day assets, aerial media day footage, social content.",
+    body: "On-field photography and drone videography for Pitt Men's & Women's Soccer.",
     href: "https://youtube.com/@ASFVisualsLLC",
-    featured: false,
   },
   {
-    n: "02",
     category: "Web + Photography",
     title: "Pittsburgh Prestige Remodeling",
     body: "Full site with Supabase gallery CMS. Photography across four project categories.",
     href: "https://prestigepgh.com",
-    featured: false,
   },
   {
-    n: "03",
     category: "Web Design",
     title: "Aqua Design Collective",
     body: "Dark design system, Supabase CMS, client admin portal.",
     href: "https://aquadesigncollective.com",
-    featured: false,
   },
   {
-    n: "04",
     category: "Commercial Real Estate",
     title: "S&G Asset Group LLC",
     body: "CRE photography across two properties — listing assets and drone aerials.",
     href: null,
-    featured: false,
   },
   {
-    n: "05",
     category: "Event Photography",
     title: "Allegheny Sport & Outdoor",
     body: "Two-day coverage of Pittsburgh's premier outdoor & sport industry summit.",
     href: null,
-    featured: false,
-  },
-  {
-    n: "06",
-    category: "Civic Event Photography",
-    title: "Global Shapers Pittsburgh Hub",
-    body: "WEF Hub events, community initiatives, and leadership programming.",
-    href: null,
-    featured: false,
   },
 ];
 
@@ -65,13 +46,12 @@ export default function Work() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries) =>
         entries.forEach((e) => {
           if (e.isIntersecting)
             e.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
-        });
-      },
-      { threshold: 0.08 }
+        }),
+      { threshold: 0.06 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -80,94 +60,353 @@ export default function Work() {
   return (
     <section
       ref={ref}
-      className="section-full bg-[#160f09] flex flex-col justify-center"
-      style={{ padding: "10vh 52px" }}
+      className="section-full flex"
+      style={{ background: "var(--bg)" }}
     >
-      <div className="w-full">
-        <p className="reveal font-mono text-[0.5rem] tracking-[0.32em] uppercase text-terra mb-8 flex items-center gap-3">
-          <span className="block w-5 h-px bg-terra" />
-          Selected Work
-        </p>
+      {/* ── Left panel — ASF Visuals branding ───────── */}
+      <div
+        className="hidden md:flex flex-col justify-between"
+        style={{
+          width: 260,
+          flexShrink: 0,
+          background: "var(--bg-panel)",
+          padding: "8vh 28px",
+          borderRight: "1px solid var(--border)",
+        }}
+      >
+        {/* Top: branding */}
+        <div className="reveal">
+          <p
+            style={{
+              fontFamily: "DM Mono, monospace",
+              fontSize: "0.44rem",
+              letterSpacing: "0.32em",
+              textTransform: "uppercase",
+              color: "var(--accent)",
+              marginBottom: 14,
+            }}
+          >
+            Selected Work
+          </p>
+          <div
+            style={{
+              fontFamily: "Bebas Neue, sans-serif",
+              fontSize: "1.8rem",
+              letterSpacing: "0.05em",
+              lineHeight: 1.0,
+              color: "var(--text)",
+              marginBottom: 6,
+            }}
+          >
+            ASF Visuals
+          </div>
+          <div
+            style={{
+              fontFamily: "DM Sans, sans-serif",
+              fontWeight: 300,
+              fontSize: "0.72rem",
+              color: "var(--text-faint)",
+              lineHeight: 1.6,
+            }}
+          >
+            Photo · Video · Drone · Web
+          </div>
+        </div>
 
-        <h2
-          className="reveal d1 font-display font-light text-cream-100 leading-[0.92] tracking-[-0.02em] mb-14"
-          style={{ fontSize: "clamp(2.8rem,5.5vw,6rem)" }}
-        >
-          Projects &amp;<br />
-          <em className="italic text-terra">collaborations</em>
-        </h2>
-
-        {/* Project rows */}
-        <div className="w-full border-t border-cream-200/08">
-          {projects.map((p, i) => (
+        {/* Mid: stats */}
+        <div className="reveal d2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          {asfStats.map((s, i) => (
             <div
               key={i}
-              className="reveal group border-b border-cream-200/07 -mx-4 px-4"
-              style={{ transitionDelay: `${i * 0.05}s` }}
+              style={{
+                padding: "12px 10px",
+                border: "1px solid var(--border)",
+                background: "var(--bg)",
+              }}
             >
-              {p.href ? (
-                <a
-                  href={p.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  data-cursor
-                  className="flex items-start justify-between py-7 gap-8
-                             hover:bg-cream-200/[0.025] transition-colors duration-300 -mx-4 px-4"
-                >
-                  <ProjectRow project={p} />
-                </a>
-              ) : (
-                <div
-                  data-cursor
-                  className="flex items-start justify-between py-7 gap-8
-                             hover:bg-cream-200/[0.025] transition-colors duration-300 -mx-4 px-4"
-                >
-                  <ProjectRow project={p} />
-                </div>
-              )}
+              <div
+                style={{
+                  fontFamily: "Bebas Neue, sans-serif",
+                  fontSize: "1.8rem",
+                  letterSpacing: "0.04em",
+                  lineHeight: 1,
+                  color: "var(--accent2)",
+                  marginBottom: 4,
+                }}
+              >
+                {s.n}
+              </div>
+              <div
+                style={{
+                  fontFamily: "DM Mono, monospace",
+                  fontSize: "0.42rem",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "var(--text-faint)",
+                }}
+              >
+                {s.l}
+              </div>
             </div>
           ))}
         </div>
+
+        {/* Bottom: links */}
+        <div className="reveal d3" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <a
+            href="https://instagram.com/asfvisuals"
+            target="_blank"
+            rel="noreferrer"
+            data-cursor
+            style={{ ...linkStyle }}
+            onMouseEnter={(e) => applyLinkHover(e, true)}
+            onMouseLeave={(e) => applyLinkHover(e, false)}
+          >
+            <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 300, fontSize: "0.78rem" }}>Instagram</span>
+            <span style={{ fontFamily: "DM Mono, monospace", fontSize: "0.42rem", letterSpacing: "0.1em", color: "var(--text-faint)" }}>@asfvisuals ↗</span>
+          </a>
+          <a
+            href="https://youtube.com/@ASFVisualsLLC"
+            target="_blank"
+            rel="noreferrer"
+            data-cursor
+            style={{ ...linkStyle }}
+            onMouseEnter={(e) => applyLinkHover(e, true)}
+            onMouseLeave={(e) => applyLinkHover(e, false)}
+          >
+            <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 300, fontSize: "0.78rem" }}>YouTube</span>
+            <span style={{ fontFamily: "DM Mono, monospace", fontSize: "0.42rem", letterSpacing: "0.1em", color: "var(--text-faint)" }}>ASF Visuals ↗</span>
+          </a>
+        </div>
+      </div>
+
+      {/* ── Right panel ───────────────────────────────── */}
+      <div className="flex-1 flex flex-col" style={{ overflow: "hidden" }}>
+
+        {/* Featured ASF Visuals project */}
+        <a
+          href="https://asfvisualsllc.com"
+          target="_blank"
+          rel="noreferrer"
+          data-cursor
+          className="reveal group"
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            padding: "7vh 40px 28px",
+            borderBottom: "1px solid var(--border)",
+            background: "transparent",
+            flexShrink: 0,
+            textDecoration: "none",
+            transition: "background 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(74,158,255,0.03)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+          }}
+        >
+          <div>
+            <p
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: "0.48rem",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                marginBottom: 10,
+              }}
+            >
+              Creative Agency · Founded 2022
+            </p>
+            <div
+              style={{
+                fontFamily: "Bebas Neue, sans-serif",
+                fontSize: "clamp(2rem, 3.5vw, 3.5rem)",
+                letterSpacing: "0.04em",
+                lineHeight: 1.0,
+                color: "var(--text)",
+              }}
+            >
+              ASF Visuals LLC
+            </div>
+            <p
+              style={{
+                fontFamily: "DM Sans, sans-serif",
+                fontWeight: 300,
+                fontSize: "0.82rem",
+                lineHeight: 1.75,
+                color: "var(--text-dim)",
+                marginTop: 8,
+                maxWidth: 480,
+              }}
+            >
+              Certified drone media business — photo, video, drone, web, SEO.
+              Serving D1 Athletics, CRE firms, and civic organizations.
+            </p>
+          </div>
+          <span
+            style={{
+              fontFamily: "DM Mono, monospace",
+              fontSize: "1.1rem",
+              color: "var(--accent)",
+              opacity: 0.4,
+              transition: "opacity 0.3s ease",
+              flexShrink: 0,
+              marginLeft: 16,
+            }}
+          >
+            ↗
+          </span>
+        </a>
+
+        {/* Client rows */}
+        <div className="flex-1" style={{ overflowY: "auto" }}>
+          {clients.map((c, i) => (
+            <ClientRow key={i} client={c} delay={i * 0.05} />
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile: simple label */}
+      <div
+        className="md:hidden"
+        style={{
+          position: "absolute",
+          top: "6vh",
+          left: 28,
+          fontFamily: "DM Mono, monospace",
+          fontSize: "0.44rem",
+          letterSpacing: "0.32em",
+          textTransform: "uppercase",
+          color: "var(--accent)",
+        }}
+      >
+        Selected Work
       </div>
     </section>
   );
 }
 
-function ProjectRow({ project: p }: { project: typeof projects[0] }) {
-  return (
-    <>
-      {/* Number */}
-      <div className="font-mono text-[0.5rem] tracking-[0.1em] text-cream-200/20 w-8 flex-shrink-0 pt-[4px]">
-        {p.n}
-      </div>
+const linkStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "10px 12px",
+  border: "1px solid var(--border)",
+  color: "var(--text)",
+  textDecoration: "none",
+  transition: "border-color 0.2s ease, background 0.2s ease",
+};
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="font-mono text-[0.5rem] tracking-[0.14em] uppercase text-terra/70 mb-2">
-          {p.category}
-        </div>
-        <div
-          className={`font-display font-light leading-[1.15] text-cream-100 mb-2
-                      group-hover:text-terra-light transition-colors duration-300
-                      ${p.featured ? "text-[1.9rem]" : "text-[1.45rem]"}`}
+function applyLinkHover(e: React.MouseEvent, entering: boolean) {
+  const el = e.currentTarget as HTMLElement;
+  el.style.borderColor = entering ? "rgba(232,228,221,0.18)" : "var(--border)";
+  el.style.background = entering ? "rgba(232,228,221,0.03)" : "transparent";
+}
+
+interface Client {
+  category: string;
+  title: string;
+  body: string;
+  href: string | null;
+}
+
+function ClientRow({ client: c, delay }: { client: Client; delay: number }) {
+  const inner = (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 12,
+        padding: "16px 40px",
+        borderBottom: "1px solid var(--border)",
+        transition: "background 0.3s ease",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.background = "rgba(232,228,221,0.022)";
+        const title = (e.currentTarget as HTMLDivElement).querySelector(".client-title") as HTMLElement | null;
+        if (title) title.style.color = "var(--accent)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.background = "transparent";
+        const title = (e.currentTarget as HTMLDivElement).querySelector(".client-title") as HTMLElement | null;
+        if (title) title.style.color = "var(--text)";
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "0.46rem",
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--accent2)",
+            marginBottom: 4,
+            opacity: 0.75,
+          }}
         >
-          {p.title}
+          {c.category}
+        </p>
+        <div
+          className="client-title"
+          style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontWeight: 400,
+            fontSize: "1.0rem",
+            color: "var(--text)",
+            lineHeight: 1.3,
+            marginBottom: 4,
+            transition: "color 0.3s ease",
+          }}
+        >
+          {c.title}
         </div>
-        <div className="font-body text-[0.73rem] text-cream-200/38 leading-[1.82] max-w-[560px]">
-          {p.body}
-        </div>
+        <p
+          style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontWeight: 300,
+            fontSize: "0.76rem",
+            lineHeight: 1.75,
+            color: "var(--text-dim)",
+            opacity: 0.7,
+          }}
+        >
+          {c.body}
+        </p>
       </div>
+      {c.href && (
+        <span
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "0.85rem",
+            color: "var(--accent)",
+            opacity: 0.35,
+            flexShrink: 0,
+            marginTop: 2,
+          }}
+        >
+          ↗
+        </span>
+      )}
+    </div>
+  );
 
-      {/* Arrow */}
-      <div className="flex-shrink-0 pt-[4px]">
-        {p.href ? (
-          <span className="font-mono text-[0.5rem] tracking-[0.1em] text-terra/40
-                           group-hover:text-terra transition-colors duration-300 opacity-0
-                           group-hover:opacity-100">
-            ↗
-          </span>
-        ) : null}
-      </div>
-    </>
+  return (
+    <div
+      className="reveal"
+      style={{ transitionDelay: `${delay}s` }}
+    >
+      {c.href ? (
+        <a href={c.href} target="_blank" rel="noreferrer" data-cursor style={{ display: "block", textDecoration: "none" }}>
+          {inner}
+        </a>
+      ) : (
+        inner
+      )}
+    </div>
   );
 }

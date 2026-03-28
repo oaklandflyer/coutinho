@@ -3,35 +3,35 @@ import { useRef, useEffect } from "react";
 
 const jobs = [
   {
-    yr: "Apr 2024 — Present",
+    yr: "Apr 2024",
     title: "Vice Curator → Curator-elect",
     org: "Global Shapers Community · World Economic Forum",
     note: "Led recruitment, events & strategy for Pittsburgh Hub. Represented Pittsburgh at WEF Annual Summit in Geneva. Orchestrating Northeast Retreat 'Bridges of Belonging,' May 2026.",
     tags: ["Leadership", "WEF"],
   },
   {
-    yr: "Oct 2022 — Present",
+    yr: "Oct 2022",
     title: "Founder & Creative Director",
     org: "ASF Visuals LLC",
     note: "Certified drone media business — photography, video, web. Clients include D1 Pitt Athletics, CRE firms, and civic orgs. FAA Part 107 licensed.",
     tags: ["Founding", "Creative"],
   },
   {
-    yr: "Aug 2024 — May 2025",
+    yr: "Aug 2024",
     title: "Global Experience Advisor",
     org: "University of Pittsburgh",
     note: "Guided students through study abroad processes. Improved engagement 30%. Streamlined advising workflows.",
     tags: ["Advising", "Ops"],
   },
   {
-    yr: "Jul — Aug 2023",
+    yr: "Jul 2023",
     title: "Cyber Security Analyst",
     org: "Robin Home Care · London, UK",
     note: "Secured sensitive data per UK regulations. VPN and password management systems company-wide.",
     tags: ["Security"],
   },
   {
-    yr: "Jan 2022 — Nov 2024",
+    yr: "Jan 2022",
     title: "Founder & President",
     org: "Bodybuilding Club at Pitt / NCBO",
     note: "0 → 100+ members, 200% social media growth. Co-founded NCBO connecting 10+ universities.",
@@ -44,13 +44,12 @@ export default function Experience() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries) =>
         entries.forEach((e) => {
           if (e.isIntersecting)
             e.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
-        });
-      },
-      { threshold: 0.1 }
+        }),
+      { threshold: 0.08 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -59,71 +58,185 @@ export default function Experience() {
   return (
     <section
       ref={ref}
-      className="section-full bg-[#1a1009] flex flex-col justify-center"
-      style={{ padding: "10vh 52px" }}
+      className="section-full flex items-center"
+      style={{ background: "var(--bg-panel)", padding: "0 52px" }}
     >
-      <div className="w-full max-w-[900px]">
-        <p className="reveal font-mono text-[0.5rem] tracking-[0.32em] uppercase text-terra mb-8 flex items-center gap-3">
-          <span className="block w-5 h-px bg-terra" />
+      <div className="w-full" style={{ maxWidth: 1100, margin: "0 auto" }}>
+
+        {/* Label */}
+        <p
+          className="reveal"
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "0.5rem",
+            letterSpacing: "0.32em",
+            textTransform: "uppercase",
+            color: "var(--accent)",
+            marginBottom: 24,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ display: "block", width: 20, height: 1, background: "var(--accent)" }} />
           Experience
         </p>
 
+        {/* Heading */}
         <h2
-          className="reveal d1 font-display font-light text-cream-100 leading-[0.92] tracking-[-0.02em] mb-14"
-          style={{ fontSize: "clamp(2.8rem,5.5vw,6rem)" }}
+          className="reveal d1"
+          style={{
+            fontFamily: "Bebas Neue, sans-serif",
+            fontSize: "clamp(2.4rem, 4.5vw, 5rem)",
+            letterSpacing: "0.04em",
+            lineHeight: 0.92,
+            color: "var(--text)",
+            marginBottom: 36,
+          }}
         >
           Where I&apos;ve led<br />
-          and <em className="italic text-terra">built</em>
+          and <span style={{ color: "var(--accent2)" }}>built</span>
         </h2>
 
+        {/* Job rows */}
         <div className="w-full">
           {jobs.map((j, i) => (
-            <div
-              key={i}
-              data-cursor
-              className="reveal group border-b border-cream-200/07 py-7
-                         hover:bg-cream-200/[0.02] transition-colors duration-300 -mx-4 px-4"
-              style={{ transitionDelay: `${i * 0.06}s` }}
-            >
-              <div className="flex items-start gap-8">
-                {/* Year */}
-                <div className="font-mono text-[0.52rem] text-cream-200/22 tracking-[0.06em] leading-none pt-[5px] w-36 flex-shrink-0">
-                  {j.yr}
-                </div>
+            <JobRow key={i} job={j} delay={i * 0.06} />
+          ))}
+        </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-6 mb-2">
-                    <div
-                      className="font-display text-[1.5rem] font-light text-cream-100 leading-[1.15]
-                                 group-hover:text-terra-light transition-colors duration-300"
-                    >
-                      {j.title}
-                    </div>
-                    <div className="flex gap-[5px] flex-shrink-0 pt-[3px]">
-                      {j.tags.map((t) => (
-                        <span
-                          key={t}
-                          className="font-mono text-[0.44rem] tracking-[0.1em] uppercase
-                                     px-2 py-[3px] border border-cream-200/10 text-cream-200/22"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="font-mono text-[0.56rem] text-terra tracking-[0.1em] uppercase mb-2">
-                    {j.org}
-                  </div>
-                  <div className="font-body text-[0.74rem] text-cream-200/38 leading-[1.82]">
-                    {j.note}
-                  </div>
-                </div>
-              </div>
-            </div>
+      </div>
+    </section>
+  );
+}
+
+interface Job {
+  yr: string;
+  title: string;
+  org: string;
+  note: string;
+  tags: string[];
+}
+
+function JobRow({ job: j, delay }: { job: Job; delay: number }) {
+  const handleEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    (e.currentTarget as HTMLDivElement).style.background = "rgba(232,228,221,0.024)";
+    const title = (e.currentTarget as HTMLDivElement).querySelector(".job-title") as HTMLElement | null;
+    if (title) title.style.color = "var(--accent)";
+  };
+  const handleLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    (e.currentTarget as HTMLDivElement).style.background = "transparent";
+    const title = (e.currentTarget as HTMLDivElement).querySelector(".job-title") as HTMLElement | null;
+    if (title) title.style.color = "var(--text)";
+  };
+
+  return (
+    <div
+      className="reveal"
+      style={{
+        borderBottom: "1px solid var(--border)",
+        padding: "20px 14px",
+        margin: "0 -14px",
+        transition: "background 0.3s ease",
+        transitionDelay: `${delay}s`,
+      }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {/* Grid: year | content | tags */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "110px 1fr auto",
+          gap: "20px",
+          alignItems: "start",
+        }}
+      >
+        {/* Year */}
+        <div
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "0.5rem",
+            letterSpacing: "0.06em",
+            color: "var(--text-faint)",
+            paddingTop: 4,
+            lineHeight: 1.5,
+          }}
+        >
+          {j.yr}
+        </div>
+
+        {/* Content */}
+        <div>
+          <div
+            className="job-title"
+            style={{
+              fontFamily: "DM Sans, sans-serif",
+              fontWeight: 400,
+              fontSize: "1.1rem",
+              lineHeight: 1.3,
+              color: "var(--text)",
+              marginBottom: 5,
+              transition: "color 0.3s ease",
+            }}
+          >
+            {j.title}
+          </div>
+          <div
+            style={{
+              fontFamily: "DM Mono, monospace",
+              fontSize: "0.5rem",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "var(--accent)",
+              marginBottom: 7,
+            }}
+          >
+            {j.org}
+          </div>
+          <div
+            style={{
+              fontFamily: "DM Sans, sans-serif",
+              fontWeight: 300,
+              fontSize: "0.8rem",
+              lineHeight: 1.85,
+              color: "var(--text-dim)",
+              opacity: 0.75,
+            }}
+          >
+            {j.note}
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+            flexShrink: 0,
+            paddingTop: 2,
+          }}
+        >
+          {j.tags.map((t) => (
+            <span
+              key={t}
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: "0.44rem",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                padding: "3px 8px",
+                border: "1px solid var(--border)",
+                color: "var(--text-faint)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t}
+            </span>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

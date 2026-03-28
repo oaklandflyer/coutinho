@@ -6,33 +6,24 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-cormorant)", "serif"],
-        body: ["var(--font-outfit)", "sans-serif"],
-        mono: ["var(--font-jetbrains)", "monospace"],
+        display: ['"Bebas Neue"', "sans-serif"],
+        body: ['"DM Sans"', "sans-serif"],
+        mono: ['"DM Mono"', "monospace"],
       },
       colors: {
-        cream: {
-          DEFAULT: "#f4efe6",
-          50: "#faf8f4",
-          100: "#f4efe6",
-          200: "#ebe4d4",
-          300: "#dfd5c0",
+        bg: "#0e0d0b",
+        panel: "#1a1a1a",
+        sky: {
+          DEFAULT: "#4a9eff",
+          dark: "#2a7fdf",
         },
-        brown: {
-          DEFAULT: "#231a12",
-          400: "#6b4f38",
-          500: "#4a3425",
-          600: "#3d2e20",
-          700: "#2c1f14",
-          800: "#231a12",
-          900: "#160f09",
+        amber: {
+          DEFAULT: "#c8873a",
+          dark: "#a06828",
         },
-        terra: {
-          DEFAULT: "#b85535",
-          light: "#d06b47",
-          dark: "#8c3e22",
+        ink: {
+          DEFAULT: "#e8e4dd",
         },
-        sand: "#8c7055",
       },
       animation: {
         "fade-up": "fadeUp 0.9s ease forwards",
