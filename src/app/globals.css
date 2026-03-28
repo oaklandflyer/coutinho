@@ -22,52 +22,51 @@ html {
 body {
   overflow: hidden;
   height: 100dvh;
-  background: #f4efe6;
-  color: #231a12;
+  background: #160f09;
+  color: #f4efe6;
   font-family: "Outfit", sans-serif;
   -webkit-font-smoothing: antialiased;
   cursor: none;
 }
 
-/* Custom scrollbar hide */
+/* Hide scrollbars */
 ::-webkit-scrollbar { display: none; }
 
 /* Selection */
 ::selection {
-  background: rgba(184, 85, 53, 0.2);
-  color: #231a12;
+  background: rgba(184, 85, 53, 0.25);
+  color: #f4efe6;
 }
 
 /* Cursor */
 .cursor-dot {
   position: fixed;
   top: 0; left: 0;
-  width: 7px; height: 7px;
+  width: 5px; height: 5px;
   border-radius: 50%;
-  background: #b85535;
+  background: #d06b47;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s;
-  mix-blend-mode: multiply;
+  transition: width 0.15s, height 0.15s;
 }
 
 .cursor-ring {
   position: fixed;
   top: 0; left: 0;
-  width: 30px; height: 30px;
+  width: 28px; height: 28px;
   border-radius: 50%;
-  border: 1.5px solid rgba(184, 85, 53, 0.4);
+  border: 1px solid rgba(184, 85, 53, 0.35);
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
   transition: width 0.3s, height 0.3s, border-color 0.3s;
 }
 
-body.hovering .cursor-dot  { width: 12px; height: 12px; }
-body.hovering .cursor-ring { width: 46px; height: 46px; border-color: #b85535; }
+body.hovering .cursor-dot  { width: 10px; height: 10px; }
+body.hovering .cursor-ring { width: 44px; height: 44px; border-color: rgba(208, 107, 71, 0.6); }
 
-/* Panel snap container */
+/* Snap container */
 .snap-container {
   height: 100dvh;
   overflow-y: scroll;
@@ -83,17 +82,17 @@ body.hovering .cursor-ring { width: 46px; height: 46px; border-color: #b85535; }
   overflow: hidden;
 }
 
-/* Grain overlay */
+/* Film grain overlay */
 .grain::after {
   content: "";
   position: fixed;
   inset: -50%;
   width: 200%;
   height: 200%;
-  opacity: 0.032;
+  opacity: 0.038;
   pointer-events: none;
   z-index: 9990;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   animation: grain 0.4s steps(3) infinite;
 }
 
@@ -107,16 +106,16 @@ body.hovering .cursor-ring { width: 46px; height: 46px; border-color: #b85535; }
 /* Reveal animations */
 .reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(20px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal.d1 { transition-delay: 0.08s; }
-.reveal.d2 { transition-delay: 0.18s; }
-.reveal.d3 { transition-delay: 0.30s; }
-.reveal.d4 { transition-delay: 0.44s; }
-.reveal.d5 { transition-delay: 0.58s; }
+.reveal.d1 { transition-delay: 0.1s; }
+.reveal.d2 { transition-delay: 0.2s; }
+.reveal.d3 { transition-delay: 0.32s; }
+.reveal.d4 { transition-delay: 0.46s; }
+.reveal.d5 { transition-delay: 0.62s; }
 
 /* Three.js canvas */
 .r3f-canvas {
@@ -125,12 +124,18 @@ body.hovering .cursor-ring { width: 46px; height: 46px; border-color: #b85535; }
   z-index: 0 !important;
 }
 
-/* Chevron animation */
+/* Scroll chevron */
 @keyframes chevronBounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
+  50% { transform: translateY(7px); }
 }
-.chevron-bounce { animation: chevronBounce 2.4s ease-in-out infinite; }
+.chevron-bounce { animation: chevronBounce 2.6s ease-in-out infinite; }
 
-/* Progress rail */
+/* Progress rail fill */
 .progress-rail { transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* fadeIn utility used by chrome */
+@keyframes fadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}

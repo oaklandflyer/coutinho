@@ -1,21 +1,100 @@
 "use client";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import * as THREE from "three";
 import { useStore } from "@/store";
 
-// ── Drone camera geometry — aperture ring, sensor plane, propeller arcs
-function DroneGeometry({ section }: { section: number }) {
+// ── Atmospheric dust — 600 scattered particles
+function DustCloud() {
+  const ref = useRef<THREE.Points>(null);
+
+  const [positions, sizes] = useMemo(() => {
+    const count = 600;
+    const pos = new Float32Array(count * 3);
+    const sz = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      // Wide spread across the scene
+      pos[i * 3]     = (Math.random() - 0.5) * 14;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 9;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 6 - 1;
+      sz[i] = Math.random() * 0.012 + 0.004;
+    }
+    return [pos, sz];
+  }, []);
+
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    ref.current.rotation.y += delta * 0.008;
+    ref.current.rotation.x += delta * 0.003;
+  });
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
+      </bufferGeometry>
+      <pointsMaterial
+        color={0xb85535}
+        size={0.018}
+        transparent
+        opacity={0.38}
+        sizeAttenuation
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
+// ── Secondary cream-toned dust layer
+function DustLayerCream() {
+  const ref = useRef<THREE.Points>(null);
+
+  const positions = useMemo(() => {
+    const count = 350;
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * 16;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 2;
+    }
+    return pos;
+  }, []);
+
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    ref.current.rotation.y -= delta * 0.005;
+    ref.current.rotation.z += delta * 0.004;
+  });
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        color={0xf4efe6}
+        size={0.009}
+        transparent
+        opacity={0.12}
+        sizeAttenuation
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
+// ── Ethereal sphere — grid lines on a globe
+function EtherealSphere({ section }: { section: number }) {
   const groupRef = useRef<THREE.Group>(null);
   const t = useRef(0);
 
-  // Morph rotation targets per section
   const targets = useMemo(() => [
-    { rx: 0.1,  ry: 0,    rz: 0,    scale: 1,    y: 0 },    // hero
-    { rx: 0.4,  ry: 0.8,  rz: 0.1,  scale: 0.9,  y: 0.2 },  // about
-    { rx: -0.2, ry: -0.5, rz: 0.2,  scale: 1.1,  y: -0.1 }, // experience
-    { rx: 0.6,  ry: 1.2,  rz: -0.1, scale: 0.95, y: 0.3 },  // work
-    { rx: 0.2,  ry: 0.3,  rz: 0,    scale: 1,    y: 0 },     // contact
+    { rx: 0.08, ry: 0,    rz: 0,    scale: 1,    y: 0,    x: 1.0 },
+    { rx: 0.35, ry: 0.7,  rz: 0.08, scale: 0.88, y: 0.2,  x: 0.8 },
+    { rx: -0.15, ry: -0.4, rz: 0.18, scale: 1.05, y: -0.1, x: 1.2 },
+    { rx: 0.5,  ry: 1.1,  rz: -0.1, scale: 0.92, y: 0.25, x: 0.9 },
+    { rx: 0.15, ry: 0.2,  rz: 0,    scale: 1,    y: 0,    x: 1.0 },
   ], []);
 
   const cur = targets[section] ?? targets[0];
@@ -24,84 +103,61 @@ function DroneGeometry({ section }: { section: number }) {
     t.current += delta;
     if (!groupRef.current) return;
     const g = groupRef.current;
-    // Smooth lerp to target rotation
-    g.rotation.x += (cur.rx - g.rotation.x) * 0.03;
-    g.rotation.y += (cur.ry + t.current * 0.12 - g.rotation.y) * 0.025;
-    g.rotation.z += (cur.rz - g.rotation.z) * 0.03;
-    const targetScale = cur.scale;
-    g.scale.x += (targetScale - g.scale.x) * 0.04;
-    g.scale.y += (targetScale - g.scale.y) * 0.04;
-    g.scale.z += (targetScale - g.scale.z) * 0.04;
-    g.position.y += (cur.y - g.position.y) * 0.03;
+    g.rotation.x += (cur.rx - g.rotation.x) * 0.028;
+    g.rotation.y += (cur.ry + t.current * 0.1 - g.rotation.y) * 0.022;
+    g.rotation.z += (cur.rz - g.rotation.z) * 0.028;
+    g.scale.setScalar(g.scale.x + (cur.scale - g.scale.x) * 0.035);
+    g.position.y += (cur.y - g.position.y) * 0.028;
+    g.position.x += (cur.x - g.position.x) * 0.028;
   });
 
-  // Latitude/longitude grid lines — like a drone aerial view
+  // Latitude / longitude grid
   const gridLines = useMemo(() => {
-    const lines = [];
-    const mat = new THREE.LineBasicMaterial({
-      color: 0xb85535,
-      transparent: true,
-      opacity: 0.12,
-    });
-    // Longitude rings
-    for (let i = 0; i < 16; i++) {
+    const R = 2.1;
+    const lines: THREE.Vector3[][] = [];
+    // Longitude arcs
+    for (let i = 0; i < 18; i++) {
       const pts: THREE.Vector3[] = [];
-      const angle = (i / 16) * Math.PI;
-      for (let j = 0; j <= 64; j++) {
-        const a = (j / 64) * Math.PI * 2;
+      const theta = (i / 18) * Math.PI;
+      for (let j = 0; j <= 80; j++) {
+        const phi = (j / 80) * Math.PI * 2;
         pts.push(new THREE.Vector3(
-          Math.cos(a) * Math.sin(angle),
-          Math.cos(angle),
-          Math.sin(a) * Math.sin(angle)
-        ).multiplyScalar(2.2));
+          R * Math.sin(theta) * Math.cos(phi),
+          R * Math.cos(theta),
+          R * Math.sin(theta) * Math.sin(phi),
+        ));
       }
       lines.push(pts);
     }
     // Latitude rings
-    for (let i = 1; i < 8; i++) {
+    for (let i = 1; i < 9; i++) {
       const pts: THREE.Vector3[] = [];
-      const lat = ((i / 8) - 0.5) * Math.PI;
-      const r = Math.cos(lat) * 2.2;
-      const y = Math.sin(lat) * 2.2;
-      for (let j = 0; j <= 64; j++) {
-        const a = (j / 64) * Math.PI * 2;
-        pts.push(new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r));
+      const lat = ((i / 9) - 0.5) * Math.PI;
+      const r = Math.cos(lat) * R;
+      const y = Math.sin(lat) * R;
+      for (let j = 0; j <= 80; j++) {
+        const phi = (j / 80) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(phi) * r, y, Math.sin(phi) * r));
       }
       lines.push(pts);
     }
-    return { lines, mat };
+    return lines;
   }, []);
 
-  // Floating particles (elevation markers)
-  const particles = useMemo(() => {
-    const count = 180;
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 1.8 + Math.random() * 1.4;
-      pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = r * Math.cos(phi);
-      pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
-    }
-    return pos;
-  }, []);
+  const lineMat = useMemo(() =>
+    new THREE.LineBasicMaterial({ color: 0xb85535, transparent: true, opacity: 0.11 }),
+  []);
 
   return (
-    <group ref={groupRef} position={[1.2, 0, 0]}>
-      {/* Sphere wireframe — aerial globe */}
+    <group ref={groupRef} position={[1.0, 0, 0]}>
+      {/* Wireframe shell */}
       <mesh>
-        <sphereGeometry args={[2.2, 32, 32]} />
-        <meshBasicMaterial
-          color={0xb85535}
-          wireframe
-          transparent
-          opacity={0.04}
-        />
+        <sphereGeometry args={[2.1, 36, 36]} />
+        <meshBasicMaterial color={0xb85535} wireframe transparent opacity={0.035} />
       </mesh>
 
       {/* Grid lines */}
-      {gridLines.lines.map((pts, i) => (
+      {gridLines.map((pts, i) => (
         <line key={i}>
           <bufferGeometry>
             <bufferAttribute
@@ -109,126 +165,115 @@ function DroneGeometry({ section }: { section: number }) {
               args={[new Float32Array(pts.flatMap(p => [p.x, p.y, p.z])), 3]}
             />
           </bufferGeometry>
-          <primitive object={gridLines.mat} attach="material" />
+          <primitive object={lineMat} attach="material" />
         </line>
       ))}
 
-      {/* Particles */}
-      <points>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[particles, 3]}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          color={0xb85535}
-          size={0.022}
-          transparent
-          opacity={0.5}
-          sizeAttenuation
-        />
-      </points>
-
       {/* Inner aperture ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.1, 0.008, 8, 128]} />
-        <meshBasicMaterial color={0xb85535} transparent opacity={0.35} />
+        <torusGeometry args={[1.05, 0.007, 8, 128]} />
+        <meshBasicMaterial color={0xb85535} transparent opacity={0.42} />
+      </mesh>
+
+      {/* Mid ring — tilted */}
+      <mesh rotation={[Math.PI / 3, Math.PI / 6, 0]}>
+        <torusGeometry args={[1.68, 0.004, 8, 128]} />
+        <meshBasicMaterial color={0xd06b47} transparent opacity={0.22} />
       </mesh>
 
       {/* Outer ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.2, 0.005, 8, 128]} />
-        <meshBasicMaterial color={0xb85535} transparent opacity={0.18} />
+        <torusGeometry args={[2.1, 0.004, 8, 128]} />
+        <meshBasicMaterial color={0xb85535} transparent opacity={0.14} />
       </mesh>
 
-      {/* Propeller arc suggestion — 4 arcs at corners */}
+      {/* Propeller suggestion arcs */}
       {[0, 1, 2, 3].map((i) => {
         const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
-        const x = Math.cos(angle) * 1.9;
-        const z = Math.sin(angle) * 1.9;
         return (
-          <mesh key={i} position={[x, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.28, 0.006, 8, 64, Math.PI * 1.5]} />
-            <meshBasicMaterial color={0x8c7055} transparent opacity={0.28} />
+          <mesh
+            key={i}
+            position={[Math.cos(angle) * 1.85, 0, Math.sin(angle) * 1.85]}
+            rotation={[Math.PI / 2, 0, 0]}
+          >
+            <torusGeometry args={[0.26, 0.005, 8, 64, Math.PI * 1.4]} />
+            <meshBasicMaterial color={0x8c7055} transparent opacity={0.22} />
           </mesh>
         );
       })}
 
-      {/* Central lens element */}
+      {/* Central core */}
       <mesh>
-        <sphereGeometry args={[0.3, 32, 32]} />
-        <meshBasicMaterial color={0xb85535} transparent opacity={0.08} />
+        <sphereGeometry args={[0.28, 24, 24]} />
+        <meshBasicMaterial color={0xb85535} transparent opacity={0.07} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[0.3, 32, 32]} />
-        <meshBasicMaterial color={0xb85535} wireframe transparent opacity={0.2} />
+        <sphereGeometry args={[0.28, 24, 24]} />
+        <meshBasicMaterial color={0xb85535} wireframe transparent opacity={0.18} />
       </mesh>
     </group>
   );
 }
 
-// ── Topographic contour lines in the background
-function TopoLines({ isDark }: { isDark: boolean }) {
-  const meshRef = useRef<THREE.Group>(null);
+// ── Drifting topo rings in the far background
+function TopoRings() {
+  const ref = useRef<THREE.Group>(null);
   useFrame((_, delta) => {
-    if (meshRef.current) meshRef.current.rotation.z += delta * 0.015;
+    if (ref.current) ref.current.rotation.z += delta * 0.012;
   });
 
-  const color = isDark ? 0xf4efe6 : 0x231a12;
-
   return (
-    <group ref={meshRef} position={[-3, -1, -4]}>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <mesh key={i} rotation={[0, 0, (i / 5) * Math.PI * 2]}>
-          <torusGeometry args={[1.5 + i * 0.6, 0.004, 8, 120]} />
-          <meshBasicMaterial color={color} transparent opacity={isDark ? 0.05 : 0.04} />
+    <group ref={ref} position={[-3.5, -1.2, -5]}>
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <mesh key={i} rotation={[0, 0, (i / 6) * Math.PI * 2]}>
+          <torusGeometry args={[1.4 + i * 0.55, 0.003, 6, 120]} />
+          <meshBasicMaterial color={0xf4efe6} transparent opacity={0.032} />
         </mesh>
       ))}
     </group>
   );
 }
 
-// ── Camera smooth lerp
+// ── Camera smooth lerp to section-specific positions
 function CameraRig({ section }: { section: number }) {
   const { camera } = useThree();
-  const positions = [
-    [0, 0, 5],
-    [0.3, 0.2, 4.8],
-    [-0.2, -0.1, 5.2],
-    [0.1, 0.3, 4.6],
-    [0, 0, 5],
+  const positions: [number, number, number][] = [
+    [0,    0,    5.2],
+    [0.25, 0.18, 5.0],
+    [-0.15, -0.08, 5.4],
+    [0.1,  0.28, 4.8],
+    [0,    0,    5.2],
   ];
   const target = positions[section] ?? positions[0];
 
   useFrame(() => {
-    camera.position.x += (target[0] - camera.position.x) * 0.025;
-    camera.position.y += (target[1] - camera.position.y) * 0.025;
-    camera.position.z += (target[2] - camera.position.z) * 0.025;
+    camera.position.x += (target[0] - camera.position.x) * 0.022;
+    camera.position.y += (target[1] - camera.position.y) * 0.022;
+    camera.position.z += (target[2] - camera.position.z) * 0.022;
   });
 
   return null;
 }
 
 export default function Scene() {
-  const { currentSection, isDark } = useStore();
+  const { currentSection } = useStore();
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
+        camera={{ position: [0, 0, 5.2], fov: 52 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
       >
         <CameraRig section={currentSection} />
+        <ambientLight intensity={0.3} />
+        <pointLight position={[4, 4, 4]} intensity={0.5} color="#b85535" />
 
-        {/* Ambient scene light */}
-        <ambientLight intensity={0.4} />
-        <pointLight position={[5, 5, 5]} intensity={0.6} color="#b85535" />
-
-        <DroneGeometry section={currentSection} />
-        <TopoLines isDark={isDark} />
+        <DustCloud />
+        <DustLayerCream />
+        <EtherealSphere section={currentSection} />
+        <TopoRings />
       </Canvas>
     </div>
   );

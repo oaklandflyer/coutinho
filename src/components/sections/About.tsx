@@ -1,7 +1,5 @@
 "use client";
 import { useRef, useEffect } from "react";
-import { useStore } from "@/store";
-import { cn } from "@/lib/utils";
 
 const stats = [
   { n: "10+", l: "Universities in the NCBO network" },
@@ -16,104 +14,108 @@ const chips = [
 ];
 
 export default function About() {
-  const { isDark } = useStore();
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.intersectionRatio >= 0.4) {
+          if (e.intersectionRatio >= 0.35)
             e.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
-          }
         });
       },
-      { threshold: 0.4 }
+      { threshold: 0.35 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
-  const text = isDark ? "text-cream-100" : "text-brown-800";
-  const sub  = isDark ? "text-cream-200/55" : "text-brown-800/65";
-  const dim  = isDark ? "text-cream-200/35" : "text-brown-800/38";
-  const border = isDark ? "border-cream-200/08" : "border-brown-800/10";
-  const bg2 = isDark ? "bg-cream-200/03" : "bg-brown-800/02";
-
   return (
     <section
       ref={ref}
       data-section="1"
-      className={cn("section-snap grid", isDark ? "bg-brown-900" : "bg-cream-200")}
+      className="section-snap bg-[#1b1109] grid"
       style={{ gridTemplateColumns: "1fr 1px 1fr" }}
     >
-      {/* Left */}
+      {/* Left — bio */}
       <div className="flex flex-col justify-center px-12 py-20">
-        <p className={cn("reveal font-mono text-[0.55rem] tracking-[0.26em] uppercase mb-6 flex items-center gap-2", "text-terra")}>
-          <span className="block w-4 h-px bg-terra" />About
+        <p className="reveal font-mono text-[0.5rem] tracking-[0.3em] uppercase text-terra mb-7 flex items-center gap-2">
+          <span className="block w-5 h-px bg-terra" />About
         </p>
 
-        <h2 className={cn("reveal d1 font-display font-light leading-[1.04] tracking-[-0.01em] mb-7", text,
-          "text-[clamp(2.6rem,4.2vw,4.8rem)]")}>
-          Multi-disciplinary<br />thinker with a<br /><em className="italic text-terra">global lens</em>
+        <h2
+          className="reveal d1 font-display font-light leading-[1.0] tracking-[-0.015em] mb-8 text-cream-100"
+          style={{ fontSize: "clamp(2.6rem,4.2vw,5rem)" }}
+        >
+          Multi-disciplinary<br />thinker with a<br />
+          <em className="italic text-terra">global lens</em>
         </h2>
 
-        <p className={cn("reveal d2 font-body font-light text-[0.88rem] leading-[1.88] mb-3", sub)}>
-          Pitt-educated in <strong className={cn("font-medium", text)}>Economics & Africana Studies</strong>.
-          I bring analytical rigor to creative and operational work — strategy, drones, code, and
-          community, often in the same week.
+        <p className="reveal d2 font-body font-light text-[0.84rem] leading-[1.95] mb-3 text-cream-200/48">
+          Pitt-educated in{" "}
+          <strong className="font-medium text-cream-200/75">Economics & Africana Studies</strong>.
+          I bring analytical rigor to creative and operational work — strategy, drones, code,
+          and community, often in the same week.
         </p>
-        <p className={cn("reveal d2 font-body font-light text-[0.88rem] leading-[1.88]", sub)}>
-          <strong className={cn("font-medium", text)}>Curator-elect</strong> of Global Shapers
-          Pittsburgh (WEF). Founder of <strong className={cn("font-medium", text)}>ASF Visuals LLC</strong>.
-          Co-founder of NCBO — competitive bodybuilding across 10+ universities.{" "}
-          <strong className={cn("font-medium", text)}>Fulbright-Hays Scholar</strong>, Tanzania 2023.
+        <p className="reveal d2 font-body font-light text-[0.84rem] leading-[1.95] text-cream-200/48">
+          <strong className="font-medium text-cream-200/75">Curator-elect</strong> of Global Shapers
+          Pittsburgh (WEF). Founder of{" "}
+          <strong className="font-medium text-cream-200/75">ASF Visuals LLC</strong>.
+          Co-founder of NCBO.{" "}
+          <strong className="font-medium text-cream-200/75">Fulbright-Hays Scholar</strong>, Tanzania 2023.
         </p>
 
-        <div className="reveal d3 flex flex-wrap gap-2 mt-6">
+        <div className="reveal d3 flex flex-wrap gap-[6px] mt-7">
           {chips.map((c) => (
-            <span key={c} className={cn(
-              "px-3 py-[5px] border font-mono text-[0.51rem] tracking-[0.1em] uppercase transition-all duration-250",
-              border, dim,
-              "hover:border-terra hover:text-terra hover:bg-terra/5"
-            )} data-cursor>{c}</span>
+            <span
+              key={c}
+              data-cursor
+              className="px-3 py-[5px] border border-cream-200/10 font-mono text-[0.48rem] tracking-[0.12em] uppercase
+                         text-cream-200/28 hover:border-terra/60 hover:text-terra hover:bg-terra/5 transition-all duration-200"
+            >
+              {c}
+            </span>
           ))}
         </div>
       </div>
 
       {/* Divider */}
-      <div className={cn("my-24", isDark ? "bg-cream-200/08" : "bg-brown-800/10")} />
+      <div className="my-16 bg-cream-200/07" />
 
-      {/* Right */}
+      {/* Right — numbers + education */}
       <div className="flex flex-col justify-center px-12 py-20">
-        <p className={cn("reveal font-mono text-[0.55rem] tracking-[0.26em] uppercase mb-6 flex items-center gap-2", "text-terra")}>
-          <span className="block w-4 h-px bg-terra" />By the numbers
+        <p className="reveal font-mono text-[0.5rem] tracking-[0.3em] uppercase text-terra mb-7 flex items-center gap-2">
+          <span className="block w-5 h-px bg-terra" />By the numbers
         </p>
 
-        <div className="mb-8">
+        <div className="mb-9">
           {stats.map((s, i) => (
-            <div key={i} className={cn("reveal flex justify-between items-baseline py-5 border-b", border,
-              i === 0 && cn("border-t", border))} style={{ "--td": `${i * 0.1}s` } as React.CSSProperties}>
-              <span className={cn("font-display font-light text-[3rem] leading-none", text)}>{s.n}</span>
-              <span className={cn("font-body text-[0.72rem] text-right max-w-[155px] leading-[1.5]", dim)}>{s.l}</span>
+            <div
+              key={i}
+              className="reveal flex justify-between items-baseline py-[18px] border-b border-cream-200/07 first:border-t first:border-cream-200/07"
+              style={{ transitionDelay: `${0.08 + i * 0.08}s` }}
+            >
+              <span className="font-display font-light text-[3rem] leading-none text-cream-100">{s.n}</span>
+              <span className="font-body text-[0.68rem] text-right max-w-[160px] leading-[1.55] text-cream-200/30">{s.l}</span>
             </div>
           ))}
         </div>
 
-        <p className={cn("reveal d3 font-mono text-[0.55rem] tracking-[0.26em] uppercase mb-4 flex items-center gap-2", "text-terra")}>
-          <span className="block w-4 h-px bg-terra" />Education
+        <p className="reveal d3 font-mono text-[0.5rem] tracking-[0.3em] uppercase text-terra mb-5 flex items-center gap-2">
+          <span className="block w-5 h-px bg-terra" />Education
         </p>
+
         {[
           { inst: "University of Pittsburgh", deg: "B.A. Economics & Africana Studies · May 2025" },
           { inst: "Fulbright-Hays Scholar", deg: "MS Training Centre · Arusha, Tanzania · 2023" },
         ].map((e, i) => (
-          <div key={i} className={cn(
-            "reveal d4 relative px-5 py-4 border mb-2 overflow-hidden",
-            bg2, border
-          )}>
+          <div
+            key={i}
+            className="reveal d4 relative px-5 py-4 border border-cream-200/07 bg-cream-200/[0.02] mb-2 overflow-hidden"
+          >
             <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-terra" />
-            <div className={cn("font-display text-[1.05rem] font-normal mb-1", text)}>{e.inst}</div>
-            <div className={cn("font-body text-[0.73rem] leading-[1.55]", dim)}>{e.deg}</div>
+            <div className="font-display text-[1.05rem] font-normal mb-[3px] text-cream-100">{e.inst}</div>
+            <div className="font-body text-[0.7rem] leading-[1.6] text-cream-200/30">{e.deg}</div>
           </div>
         ))}
       </div>

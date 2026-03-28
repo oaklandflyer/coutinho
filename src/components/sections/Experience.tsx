@@ -1,13 +1,12 @@
 "use client";
 import { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
 
 const jobs = [
   {
     yr: "Apr 2024 — Present",
     title: "Vice Curator → Curator-elect",
     org: "Global Shapers Community · World Economic Forum",
-    note: "Led recruitment, events & strategy for Pittsburgh Hub. Represented Pittsburgh at WEF Annual Summit in Geneva. Orchestrating Northeast Retreat \u2018Bridges of Belonging,\u2019 May 2026. Becoming Curator July 2026.",
+    note: "Led recruitment, events & strategy for Pittsburgh Hub. Represented Pittsburgh at WEF Annual Summit in Geneva. Orchestrating Northeast Retreat 'Bridges of Belonging,' May 2026.",
     tags: ["Leadership", "WEF", "Strategy"],
   },
   {
@@ -47,11 +46,11 @@ export default function Experience() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.intersectionRatio >= 0.3)
+          if (e.intersectionRatio >= 0.25)
             e.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.25 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -61,45 +60,62 @@ export default function Experience() {
     <section
       ref={ref}
       data-section="2"
-      className="section-snap bg-brown-800 flex flex-col justify-center"
-      style={{ padding: "80px 48px 60px" }}
+      className="section-snap bg-[#160f09] flex flex-col justify-center"
+      style={{ padding: "6vh 52px 5vh" }}
     >
-      <p className="reveal font-mono text-[0.55rem] tracking-[0.26em] uppercase mb-4 text-terra-light flex items-center gap-2">
-        <span className="block w-4 h-px bg-terra-light" />Experience
-      </p>
-      <h2 className="reveal d1 font-display font-light text-cream-100 leading-[1.04] tracking-[-0.01em] mb-8"
-        style={{ fontSize: "clamp(2.4rem,4vw,4.4rem)" }}>
-        Where I&apos;ve led<br />and <em className="italic text-terra-light">built</em>
-      </h2>
+      {/* Header */}
+      <div className="mb-7">
+        <p className="reveal font-mono text-[0.5rem] tracking-[0.3em] uppercase text-terra mb-4 flex items-center gap-2">
+          <span className="block w-5 h-px bg-terra" />Experience
+        </p>
+        <h2
+          className="reveal d1 font-display font-light text-cream-100 leading-[0.94] tracking-[-0.02em]"
+          style={{ fontSize: "clamp(2.8rem,5.5vw,6.5rem)" }}
+        >
+          Where I&apos;ve led<br />
+          and <em className="italic text-terra">built</em>
+        </h2>
+      </div>
 
+      {/* Jobs table */}
       <div className="reveal d2 w-full">
         {jobs.map((j, i) => (
           <div
             key={i}
             data-cursor
-            className="group grid gap-7 py-6 border-b border-cream-200/07 relative
-                       hover:bg-cream-200/02 transition-colors duration-200"
-            style={{ gridTemplateColumns: "164px 1fr 170px" }}
+            className="group grid py-5 border-b border-cream-200/07 relative
+                       hover:bg-cream-200/[0.025] transition-colors duration-200"
+            style={{ gridTemplateColumns: "168px 1fr 148px" }}
           >
-            <div className="font-mono text-[0.58rem] text-cream-200/28 leading-[1.7] tracking-[0.04em] pt-[3px]">
+            {/* Date */}
+            <div className="font-mono text-[0.54rem] text-cream-200/24 leading-[1.8] tracking-[0.04em] pt-[2px]">
               {j.yr}
             </div>
-            <div>
-              <div className="font-display text-[1.4rem] font-light text-cream-100 leading-[1.2] mb-1
-                              group-hover:text-terra-light transition-colors duration-200">
+
+            {/* Role */}
+            <div className="pr-6">
+              <div
+                className="font-display text-[1.45rem] font-light text-cream-100 leading-[1.15] mb-[3px]
+                           group-hover:text-terra-light transition-colors duration-200"
+              >
                 {j.title}
               </div>
-              <div className="font-body text-[0.64rem] text-terra-light tracking-[0.1em] uppercase font-medium mb-2">
+              <div className="font-body text-[0.6rem] text-terra tracking-[0.1em] uppercase font-medium mb-2">
                 {j.org}
               </div>
-              <div className="font-body text-[0.73rem] text-cream-200/42 leading-[1.72]">
+              <div className="font-body text-[0.72rem] text-cream-200/38 leading-[1.78]">
                 {j.note}
               </div>
             </div>
-            <div className="flex flex-col items-end gap-1 pt-[3px]">
+
+            {/* Tags */}
+            <div className="flex flex-col items-end gap-[5px] pt-[2px]">
               {j.tags.map((t) => (
-                <span key={t} className="font-mono text-[0.49rem] tracking-[0.1em] uppercase
-                                         px-2 py-[3px] border border-cream-200/10 text-cream-200/28">
+                <span
+                  key={t}
+                  className="font-mono text-[0.46rem] tracking-[0.1em] uppercase
+                             px-[7px] py-[3px] border border-cream-200/10 text-cream-200/25"
+                >
                   {t}
                 </span>
               ))}

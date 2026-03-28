@@ -6,4 +6,3 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const SECTION_LABELS = ["Home", "About", "Experience", "Work", "Contact"];
-export const SECTION_DARK = [false, false, true, false, false]; // which sections have dark bg

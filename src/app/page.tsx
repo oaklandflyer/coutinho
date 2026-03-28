@@ -9,28 +9,17 @@ import About from "@/components/sections/About";
 import Experience from "@/components/sections/Experience";
 import Work from "@/components/sections/Work";
 import Contact from "@/components/sections/Contact";
-import { SECTION_DARK } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 
-// Load Three.js scene client-side only (no SSR)
 const Scene = dynamic(() => import("@/components/three/Scene"), { ssr: false });
 
 export default function Home() {
-  const { setCurrentSection, isDark, setTransitioning } = useStore();
+  const { setCurrentSection } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentRef = useRef(0);
 
-  // Sync dark mode class on body
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-    document.body.style.background = isDark ? "#160f09" : "#f4efe6";
-  }, [isDark]);
-
-  // Observe which section is in view
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
-
     const sections = container.querySelectorAll("[data-section]");
     const observer = new IntersectionObserver(
       (entries) => {
@@ -46,12 +35,10 @@ export default function Home() {
       },
       { root: container, threshold: 0.5 }
     );
-
     sections.forEach((s) => observer.observe(s));
     return () => observer.disconnect();
   }, [setCurrentSection]);
 
-  // Navigate programmatically
   const navigateTo = useCallback((i: number) => {
     const container = scrollRef.current;
     if (!container) return;
@@ -59,7 +46,6 @@ export default function Home() {
     if (target) target.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const cur = currentRef.current;
@@ -77,24 +63,11 @@ export default function Home() {
   }, [navigateTo]);
 
   return (
-    <main className={cn(
-      "relative w-full h-full transition-colors duration-500",
-      isDark ? "bg-[#160f09]" : "bg-cream-100"
-    )}>
-      {/* Custom cursor */}
+    <main className="relative w-full h-full bg-[#160f09]">
       <Cursor />
-
-      {/* 3D Scene — fixed behind everything */}
       <Scene />
-
-      {/* Fixed UI chrome */}
       <Chrome onNavigate={navigateTo} />
-
-      {/* Scrollable sections */}
-      <div
-        ref={scrollRef}
-        className="snap-container relative z-10"
-      >
+      <div ref={scrollRef} className="snap-container relative z-10">
         <Hero />
         <About />
         <Experience />
