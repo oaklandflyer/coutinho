@@ -3,141 +3,57 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useRef, useMemo } from "react";
 import * as THREE from "three";
 import { useStore } from "@/store";
+import { viewport } from "@/lib/viewport";
 
-// ── Atmospheric dust — 600 scattered particles
-function DustCloud() {
-  const ref = useRef<THREE.Points>(null);
+// ── Section-specific config: where the sphere lives at each scroll stop
+const SECTION_CONFIGS = [
+  // hero: large, centered-right, prominent
+  { x: 1.0, y: 0,    z: 0,    scale: 1.15, opacity: 1 },
+  // about: moves left a touch, slightly smaller
+  { x: 0.4, y: 0.3,  z: -0.3, scale: 0.88, opacity: 0.75 },
+  // experience: further back, dim
+  { x: 1.2, y: -0.3, z: -0.5, scale: 0.78, opacity: 0.55 },
+  // work: right side, mid-size
+  { x: 0.7, y: 0.2,  z: -0.2, scale: 0.85, opacity: 0.65 },
+  // contact: subtle, background
+  { x: 0.3, y: -0.2, z: -0.6, scale: 0.7,  opacity: 0.45 },
+];
 
-  const [positions, sizes] = useMemo(() => {
-    const count = 600;
-    const pos = new Float32Array(count * 3);
-    const sz = new Float32Array(count);
-    for (let i = 0; i < count; i++) {
-      // Wide spread across the scene
-      pos[i * 3]     = (Math.random() - 0.5) * 14;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 9;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 6 - 1;
-      sz[i] = Math.random() * 0.012 + 0.004;
-    }
-    return [pos, sz];
-  }, []);
-
-  useFrame((_, delta) => {
-    if (!ref.current) return;
-    ref.current.rotation.y += delta * 0.008;
-    ref.current.rotation.x += delta * 0.003;
-  });
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color={0xb85535}
-        size={0.018}
-        transparent
-        opacity={0.38}
-        sizeAttenuation
-        depthWrite={false}
-      />
-    </points>
-  );
-}
-
-// ── Secondary cream-toned dust layer
-function DustLayerCream() {
-  const ref = useRef<THREE.Points>(null);
-
-  const positions = useMemo(() => {
-    const count = 350;
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      pos[i * 3]     = (Math.random() - 0.5) * 16;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 2;
-    }
-    return pos;
-  }, []);
-
-  useFrame((_, delta) => {
-    if (!ref.current) return;
-    ref.current.rotation.y -= delta * 0.005;
-    ref.current.rotation.z += delta * 0.004;
-  });
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color={0xf4efe6}
-        size={0.009}
-        transparent
-        opacity={0.12}
-        sizeAttenuation
-        depthWrite={false}
-      />
-    </points>
-  );
-}
-
-// ── Ethereal sphere — grid lines on a globe
+// ── Main sphere — grid + rings + core
 function EtherealSphere({ section }: { section: number }) {
   const groupRef = useRef<THREE.Group>(null);
-  const t = useRef(0);
+  const timeRef = useRef(0);
+  const opacityRef = useRef(1);
 
-  const targets = useMemo(() => [
-    { rx: 0.08, ry: 0,    rz: 0,    scale: 1,    y: 0,    x: 1.0 },
-    { rx: 0.35, ry: 0.7,  rz: 0.08, scale: 0.88, y: 0.2,  x: 0.8 },
-    { rx: -0.15, ry: -0.4, rz: 0.18, scale: 1.05, y: -0.1, x: 1.2 },
-    { rx: 0.5,  ry: 1.1,  rz: -0.1, scale: 0.92, y: 0.25, x: 0.9 },
-    { rx: 0.15, ry: 0.2,  rz: 0,    scale: 1,    y: 0,    x: 1.0 },
-  ], []);
+  const cfg = SECTION_CONFIGS[section] ?? SECTION_CONFIGS[0];
 
-  const cur = targets[section] ?? targets[0];
-
-  useFrame((_, delta) => {
-    t.current += delta;
-    if (!groupRef.current) return;
-    const g = groupRef.current;
-    g.rotation.x += (cur.rx - g.rotation.x) * 0.028;
-    g.rotation.y += (cur.ry + t.current * 0.1 - g.rotation.y) * 0.022;
-    g.rotation.z += (cur.rz - g.rotation.z) * 0.028;
-    g.scale.setScalar(g.scale.x + (cur.scale - g.scale.x) * 0.035);
-    g.position.y += (cur.y - g.position.y) * 0.028;
-    g.position.x += (cur.x - g.position.x) * 0.028;
-  });
-
-  // Latitude / longitude grid
+  // Build lat/lon grid lines once
   const gridLines = useMemo(() => {
-    const R = 2.1;
-    const lines: THREE.Vector3[][] = [];
-    // Longitude arcs
+    const R = 2.6;
+    const lines: number[][] = [];
+    // Longitude arcs (18)
     for (let i = 0; i < 18; i++) {
-      const pts: THREE.Vector3[] = [];
+      const pts: number[] = [];
       const theta = (i / 18) * Math.PI;
       for (let j = 0; j <= 80; j++) {
         const phi = (j / 80) * Math.PI * 2;
-        pts.push(new THREE.Vector3(
+        pts.push(
           R * Math.sin(theta) * Math.cos(phi),
           R * Math.cos(theta),
           R * Math.sin(theta) * Math.sin(phi),
-        ));
+        );
       }
       lines.push(pts);
     }
-    // Latitude rings
+    // Latitude rings (8)
     for (let i = 1; i < 9; i++) {
-      const pts: THREE.Vector3[] = [];
+      const pts: number[] = [];
       const lat = ((i / 9) - 0.5) * Math.PI;
       const r = Math.cos(lat) * R;
       const y = Math.sin(lat) * R;
       for (let j = 0; j <= 80; j++) {
         const phi = (j / 80) * Math.PI * 2;
-        pts.push(new THREE.Vector3(Math.cos(phi) * r, y, Math.sin(phi) * r));
+        pts.push(Math.cos(phi) * r, y, Math.sin(phi) * r);
       }
       lines.push(pts);
     }
@@ -145,15 +61,57 @@ function EtherealSphere({ section }: { section: number }) {
   }, []);
 
   const lineMat = useMemo(() =>
-    new THREE.LineBasicMaterial({ color: 0xb85535, transparent: true, opacity: 0.11 }),
+    new THREE.LineBasicMaterial({ color: 0xb85535, transparent: true, opacity: 0.1 }),
   []);
+
+  const wireframeMat = useMemo(() =>
+    new THREE.MeshBasicMaterial({ color: 0xb85535, wireframe: true, transparent: true, opacity: 0.032 }),
+  []);
+
+  useFrame((_, delta) => {
+    timeRef.current += delta;
+    if (!groupRef.current) return;
+    const g = groupRef.current;
+    const t = timeRef.current;
+
+    // Base auto-rotation
+    const baseRotY = t * 0.09;
+
+    // Mouse influence (subtle)
+    const mouseInfluenceX = viewport.mouseY * 0.18;
+    const mouseInfluenceY = viewport.mouseX * 0.22;
+
+    // Lerp position
+    g.position.x += (cfg.x - g.position.x) * 0.03;
+    g.position.y += (cfg.y - g.position.y) * 0.03;
+    g.position.z += (cfg.z - g.position.z) * 0.03;
+
+    // Lerp rotation toward mouse + auto-spin
+    const targetRotX = mouseInfluenceX;
+    const targetRotY = baseRotY + mouseInfluenceY;
+    g.rotation.x += (targetRotX - g.rotation.x) * 0.035;
+    g.rotation.y += (targetRotY - g.rotation.y) * 0.018;
+
+    // Scale
+    g.scale.setScalar(g.scale.x + (cfg.scale - g.scale.x) * 0.03);
+
+    // Opacity via material traverse
+    opacityRef.current += (cfg.opacity - opacityRef.current) * 0.04;
+    g.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh || (child as THREE.Line).isLine || (child as THREE.Points).isPoints) {
+        const mat = (child as THREE.Mesh).material as THREE.Material & { opacity?: number };
+        if (mat && mat.opacity !== undefined) {
+          mat.opacity = Math.min(mat.opacity / (opacityRef.current || 1) * opacityRef.current, 1);
+        }
+      }
+    });
+  });
 
   return (
     <group ref={groupRef} position={[1.0, 0, 0]}>
       {/* Wireframe shell */}
-      <mesh>
-        <sphereGeometry args={[2.1, 36, 36]} />
-        <meshBasicMaterial color={0xb85535} wireframe transparent opacity={0.035} />
+      <mesh material={wireframeMat}>
+        <sphereGeometry args={[2.6, 40, 40]} />
       </mesh>
 
       {/* Grid lines */}
@@ -162,94 +120,155 @@ function EtherealSphere({ section }: { section: number }) {
           <bufferGeometry>
             <bufferAttribute
               attach="attributes-position"
-              args={[new Float32Array(pts.flatMap(p => [p.x, p.y, p.z])), 3]}
+              args={[new Float32Array(pts), 3]}
             />
           </bufferGeometry>
           <primitive object={lineMat} attach="material" />
         </line>
       ))}
 
-      {/* Inner aperture ring */}
+      {/* Inner aperture ring — horizontal */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.05, 0.007, 8, 128]} />
-        <meshBasicMaterial color={0xb85535} transparent opacity={0.42} />
+        <torusGeometry args={[1.2, 0.008, 8, 128]} />
+        <meshBasicMaterial color={0xb85535} transparent opacity={0.5} />
       </mesh>
 
-      {/* Mid ring — tilted */}
-      <mesh rotation={[Math.PI / 3, Math.PI / 6, 0]}>
-        <torusGeometry args={[1.68, 0.004, 8, 128]} />
-        <meshBasicMaterial color={0xd06b47} transparent opacity={0.22} />
+      {/* Mid ring — tilted 60° */}
+      <mesh rotation={[Math.PI / 3, Math.PI / 5, 0]}>
+        <torusGeometry args={[1.95, 0.005, 8, 128]} />
+        <meshBasicMaterial color={0xd06b47} transparent opacity={0.28} />
       </mesh>
 
-      {/* Outer ring */}
+      {/* Outer ring — vertical */}
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <torusGeometry args={[2.6, 0.004, 8, 128]} />
+        <meshBasicMaterial color={0xb85535} transparent opacity={0.16} />
+      </mesh>
+
+      {/* Outer ring — horizontal */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.1, 0.004, 8, 128]} />
-        <meshBasicMaterial color={0xb85535} transparent opacity={0.14} />
+        <torusGeometry args={[2.6, 0.003, 8, 128]} />
+        <meshBasicMaterial color={0x8c7055} transparent opacity={0.1} />
       </mesh>
 
-      {/* Propeller suggestion arcs */}
+      {/* Propeller arc suggestions */}
       {[0, 1, 2, 3].map((i) => {
         const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
         return (
-          <mesh
-            key={i}
-            position={[Math.cos(angle) * 1.85, 0, Math.sin(angle) * 1.85]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <torusGeometry args={[0.26, 0.005, 8, 64, Math.PI * 1.4]} />
-            <meshBasicMaterial color={0x8c7055} transparent opacity={0.22} />
+          <mesh key={i} position={[Math.cos(angle) * 2.2, 0, Math.sin(angle) * 2.2]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.32, 0.006, 8, 64, Math.PI * 1.4]} />
+            <meshBasicMaterial color={0x8c7055} transparent opacity={0.2} />
           </mesh>
         );
       })}
 
-      {/* Central core */}
+      {/* Central glowing core */}
       <mesh>
-        <sphereGeometry args={[0.28, 24, 24]} />
-        <meshBasicMaterial color={0xb85535} transparent opacity={0.07} />
+        <sphereGeometry args={[0.22, 24, 24]} />
+        <meshBasicMaterial color={0xd06b47} transparent opacity={0.15} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[0.28, 24, 24]} />
-        <meshBasicMaterial color={0xb85535} wireframe transparent opacity={0.18} />
+        <sphereGeometry args={[0.22, 24, 24]} />
+        <meshBasicMaterial color={0xb85535} wireframe transparent opacity={0.3} />
       </mesh>
     </group>
   );
 }
 
-// ── Drifting topo rings in the far background
-function TopoRings() {
-  const ref = useRef<THREE.Group>(null);
+// ── Terracotta dust — 700 particles
+function DustTerra() {
+  const ref = useRef<THREE.Points>(null);
+
+  const positions = useMemo(() => {
+    const count = 700;
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * 18;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 12;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 1;
+    }
+    return pos;
+  }, []);
+
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.z += delta * 0.012;
+    if (!ref.current) return;
+    ref.current.rotation.y += delta * 0.006;
+    ref.current.rotation.x += delta * 0.0025;
   });
 
   return (
-    <group ref={ref} position={[-3.5, -1.2, -5]}>
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial color={0xb85535} size={0.016} transparent opacity={0.32} sizeAttenuation depthWrite={false} />
+    </points>
+  );
+}
+
+// ── Cream dust — 400 particles, counter-rotating
+function DustCream() {
+  const ref = useRef<THREE.Points>(null);
+
+  const positions = useMemo(() => {
+    const count = 400;
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * 20;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 14;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
+    }
+    return pos;
+  }, []);
+
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    ref.current.rotation.y -= delta * 0.004;
+    ref.current.rotation.z += delta * 0.003;
+  });
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial color={0xf4efe6} size={0.007} transparent opacity={0.1} sizeAttenuation depthWrite={false} />
+    </points>
+  );
+}
+
+// ── Slow topo rings, bottom-left background
+function TopoRings() {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.z += delta * 0.01;
+  });
+  return (
+    <group ref={ref} position={[-4, -1.8, -6]}>
       {[0, 1, 2, 3, 4, 5].map((i) => (
         <mesh key={i} rotation={[0, 0, (i / 6) * Math.PI * 2]}>
-          <torusGeometry args={[1.4 + i * 0.55, 0.003, 6, 120]} />
-          <meshBasicMaterial color={0xf4efe6} transparent opacity={0.032} />
+          <torusGeometry args={[1.6 + i * 0.6, 0.003, 6, 120]} />
+          <meshBasicMaterial color={0xf4efe6} transparent opacity={0.028} />
         </mesh>
       ))}
     </group>
   );
 }
 
-// ── Camera smooth lerp to section-specific positions
-function CameraRig({ section }: { section: number }) {
+// ── Smooth camera that reacts to scroll + mouse
+function CameraRig() {
   const { camera } = useThree();
-  const positions: [number, number, number][] = [
-    [0,    0,    5.2],
-    [0.25, 0.18, 5.0],
-    [-0.15, -0.08, 5.4],
-    [0.1,  0.28, 4.8],
-    [0,    0,    5.2],
-  ];
-  const target = positions[section] ?? positions[0];
 
   useFrame(() => {
-    camera.position.x += (target[0] - camera.position.x) * 0.022;
-    camera.position.y += (target[1] - camera.position.y) * 0.022;
-    camera.position.z += (target[2] - camera.position.z) * 0.022;
+    // Base position drifts with scroll
+    const p = viewport.scrollProgress;
+    const targetZ = 5.5 - p * 0.6;
+    const targetX = 0 + viewport.mouseX * 0.08;
+    const targetY = 0 + viewport.mouseY * 0.05;
+
+    camera.position.x += (targetX - camera.position.x) * 0.02;
+    camera.position.y += (targetY - camera.position.y) * 0.02;
+    camera.position.z += (targetZ - camera.position.z) * 0.025;
   });
 
   return null;
@@ -261,17 +280,18 @@ export default function Scene() {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
-        camera={{ position: [0, 0, 5.2], fov: 52 }}
+        camera={{ position: [0, 0, 5.5], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
         dpr={[1, 1.5]}
       >
-        <CameraRig section={currentSection} />
-        <ambientLight intensity={0.3} />
-        <pointLight position={[4, 4, 4]} intensity={0.5} color="#b85535" />
+        <CameraRig />
+        <ambientLight intensity={0.25} />
+        <pointLight position={[3, 4, 3]} intensity={0.6} color="#b85535" />
+        <pointLight position={[-4, -2, 2]} intensity={0.15} color="#f4efe6" />
 
-        <DustCloud />
-        <DustLayerCream />
+        <DustTerra />
+        <DustCream />
         <EtherealSphere section={currentSection} />
         <TopoRings />
       </Canvas>
