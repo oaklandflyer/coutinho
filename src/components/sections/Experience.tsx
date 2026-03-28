@@ -1,242 +1,105 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useReveal } from "@/lib/useReveal";
 
 const jobs = [
   {
-    yr: "Apr 2024",
+    yr:    "Apr 2024 — Present",
     title: "Vice Curator → Curator-elect",
-    org: "Global Shapers Community · World Economic Forum",
-    note: "Led recruitment, events & strategy for Pittsburgh Hub. Represented Pittsburgh at WEF Annual Summit in Geneva. Orchestrating Northeast Retreat 'Bridges of Belonging,' May 2026.",
-    tags: ["Leadership", "WEF"],
+    org:   "Global Shapers Community · World Economic Forum",
+    note:  "Led recruitment, events & strategy for Pittsburgh Hub. Represented Pittsburgh at WEF Annual Summit in Geneva. Orchestrating Northeast Retreat 'Bridges of Belonging,' May 2026.",
+    tags:  ["Leadership", "WEF"],
   },
   {
-    yr: "Oct 2022",
+    yr:    "Oct 2022 — Present",
     title: "Founder & Creative Director",
-    org: "ASF Visuals LLC",
-    note: "Certified drone media business — photography, video, web. Clients include D1 Pitt Athletics, CRE firms, and civic orgs. FAA Part 107 licensed.",
-    tags: ["Founding", "Creative"],
+    org:   "ASF Visuals LLC",
+    note:  "Certified drone media business — photography, video, web. Clients include D1 Pitt Athletics, CRE firms, and civic orgs. FAA Part 107 licensed.",
+    tags:  ["Founding", "Creative"],
   },
   {
-    yr: "Aug 2024",
+    yr:    "Aug 2024 — May 2025",
     title: "Global Experience Advisor",
-    org: "University of Pittsburgh",
-    note: "Guided students through study abroad processes. Improved engagement 30%. Streamlined advising workflows.",
-    tags: ["Advising", "Ops"],
+    org:   "University of Pittsburgh",
+    note:  "Guided students through study abroad processes. Improved engagement 30%. Streamlined advising workflows.",
+    tags:  ["Advising", "Ops"],
   },
   {
-    yr: "Jul 2023",
+    yr:    "Jul — Aug 2023",
     title: "Cyber Security Analyst",
-    org: "Robin Home Care · London, UK",
-    note: "Secured sensitive data per UK regulations. VPN and password management systems company-wide.",
-    tags: ["Security"],
+    org:   "Robin Home Care · London, UK",
+    note:  "Secured sensitive data per UK regulations. VPN and password management systems company-wide.",
+    tags:  ["Security"],
   },
   {
-    yr: "Jan 2022",
+    yr:    "Jan 2022 — Nov 2024",
     title: "Founder & President",
-    org: "Bodybuilding Club at Pitt / NCBO",
-    note: "0 → 100+ members, 200% social media growth. Co-founded NCBO connecting 10+ universities.",
-    tags: ["Founding", "Growth"],
+    org:   "Bodybuilding Club at Pitt / NCBO",
+    note:  "0 → 100+ members, 200% social media growth. Co-founded NCBO connecting 10+ universities.",
+    tags:  ["Founding", "Growth"],
   },
 ];
 
 export default function Experience() {
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting)
-            e.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
-        }),
-      { threshold: 0.08 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+  const ref = useReveal();
 
   return (
     <section
       ref={ref}
-      className="section-full flex items-center"
-      style={{ background: "var(--bg-panel)", padding: "0 52px" }}
+      id="experience"
+      className="min-h-screen flex items-center px-10 md:px-14 py-28 bg-panel"
     >
-      <div className="w-full" style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <div className="w-full max-w-5xl mx-auto">
 
-        {/* Label */}
-        <p
-          className="reveal"
-          style={{
-            fontFamily: "DM Mono, monospace",
-            fontSize: "0.5rem",
-            letterSpacing: "0.32em",
-            textTransform: "uppercase",
-            color: "var(--accent)",
-            marginBottom: 24,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <span style={{ display: "block", width: 20, height: 1, background: "var(--accent)" }} />
-          Experience
+        <p className="reveal font-mono text-[0.5rem] tracking-[0.32em] uppercase text-sky mb-8 flex items-center gap-2">
+          <span className="block w-5 h-px bg-sky" /> Experience
         </p>
 
-        {/* Heading */}
-        <h2
-          className="reveal d1"
-          style={{
-            fontFamily: "Bebas Neue, sans-serif",
-            fontSize: "clamp(2.4rem, 4.5vw, 5rem)",
-            letterSpacing: "0.04em",
-            lineHeight: 0.92,
-            color: "var(--text)",
-            marginBottom: 36,
-          }}
-        >
-          Where I&apos;ve led<br />
-          and <span style={{ color: "var(--accent2)" }}>built</span>
+        <h2 className="reveal d1 font-display text-[clamp(2.4rem,4.5vw,5rem)] leading-none tracking-[0.04em] text-ink mb-12">
+          Where I&apos;ve led and <span className="text-amber">built</span>
         </h2>
 
-        {/* Job rows */}
-        <div className="w-full">
+        <div>
           {jobs.map((j, i) => (
-            <JobRow key={i} job={j} delay={i * 0.06} />
+            <div
+              key={i}
+              className="reveal border-b border-ink/[0.07] py-6 grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr_auto] gap-x-5 gap-y-3 items-start
+                         hover:bg-ink/[0.02] -mx-3 px-3 transition-colors duration-300"
+              style={{ transitionDelay: `${i * 0.05}s` }}
+            >
+              {/* Year */}
+              <span className="font-mono text-[0.48rem] text-ink/20 pt-1 leading-relaxed">
+                {j.yr}
+              </span>
+
+              {/* Content */}
+              <div>
+                <div className="font-body font-normal text-[1.05rem] text-ink mb-1 leading-snug">
+                  {j.title}
+                </div>
+                <div className="font-mono text-[0.48rem] uppercase tracking-[0.1em] text-sky mb-2">
+                  {j.org}
+                </div>
+                <div className="font-body font-light text-[0.8rem] text-ink/40 leading-[1.8]">
+                  {j.note}
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="col-span-2 md:col-span-1 flex flex-wrap md:flex-col gap-1.5 md:items-end">
+                {j.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="font-mono text-[0.42rem] uppercase tracking-[0.1em] px-2 py-1 border border-ink/10 text-ink/22"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
 
       </div>
     </section>
-  );
-}
-
-interface Job {
-  yr: string;
-  title: string;
-  org: string;
-  note: string;
-  tags: string[];
-}
-
-function JobRow({ job: j, delay }: { job: Job; delay: number }) {
-  const handleEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    (e.currentTarget as HTMLDivElement).style.background = "rgba(232,228,221,0.024)";
-    const title = (e.currentTarget as HTMLDivElement).querySelector(".job-title") as HTMLElement | null;
-    if (title) title.style.color = "var(--accent)";
-  };
-  const handleLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    (e.currentTarget as HTMLDivElement).style.background = "transparent";
-    const title = (e.currentTarget as HTMLDivElement).querySelector(".job-title") as HTMLElement | null;
-    if (title) title.style.color = "var(--text)";
-  };
-
-  return (
-    <div
-      className="reveal"
-      style={{
-        borderBottom: "1px solid var(--border)",
-        padding: "20px 14px",
-        margin: "0 -14px",
-        transition: "background 0.3s ease",
-        transitionDelay: `${delay}s`,
-      }}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-    >
-      {/* Grid: year | content | tags */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "110px 1fr auto",
-          gap: "20px",
-          alignItems: "start",
-        }}
-      >
-        {/* Year */}
-        <div
-          style={{
-            fontFamily: "DM Mono, monospace",
-            fontSize: "0.5rem",
-            letterSpacing: "0.06em",
-            color: "var(--text-faint)",
-            paddingTop: 4,
-            lineHeight: 1.5,
-          }}
-        >
-          {j.yr}
-        </div>
-
-        {/* Content */}
-        <div>
-          <div
-            className="job-title"
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              fontWeight: 400,
-              fontSize: "1.1rem",
-              lineHeight: 1.3,
-              color: "var(--text)",
-              marginBottom: 5,
-              transition: "color 0.3s ease",
-            }}
-          >
-            {j.title}
-          </div>
-          <div
-            style={{
-              fontFamily: "DM Mono, monospace",
-              fontSize: "0.5rem",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--accent)",
-              marginBottom: 7,
-            }}
-          >
-            {j.org}
-          </div>
-          <div
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              fontWeight: 300,
-              fontSize: "0.8rem",
-              lineHeight: 1.85,
-              color: "var(--text-dim)",
-              opacity: 0.75,
-            }}
-          >
-            {j.note}
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-            flexShrink: 0,
-            paddingTop: 2,
-          }}
-        >
-          {j.tags.map((t) => (
-            <span
-              key={t}
-              style={{
-                fontFamily: "DM Mono, monospace",
-                fontSize: "0.44rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                padding: "3px 8px",
-                border: "1px solid var(--border)",
-                color: "var(--text-faint)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }
