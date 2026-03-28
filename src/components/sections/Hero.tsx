@@ -8,76 +8,202 @@ interface HeroProps {
 export default function Hero({ onScrollTo }: HeroProps) {
   const ref = useRef<HTMLElement>(null);
 
-  // Trigger reveals immediately on mount
   useEffect(() => {
     const els = ref.current?.querySelectorAll(".reveal");
     els?.forEach((el, i) => {
-      setTimeout(() => el.classList.add("visible"), 120 + i * 60);
+      setTimeout(() => el.classList.add("visible"), 150 + i * 90);
     });
   }, []);
 
   return (
     <section
       ref={ref}
-      className="section-full flex flex-col justify-between"
-      style={{ padding: "calc(7vh + 60px) 52px 7vh" }}
+      className="section-full flex"
+      style={{ background: "var(--bg)" }}
     >
-      {/* Top row — location + availability */}
-      <div className="reveal flex items-center justify-between w-full relative z-10">
-        <span className="font-mono text-[0.5rem] tracking-[0.3em] uppercase text-cream-200/28 flex items-center gap-3">
-          <span className="block w-8 h-px bg-cream-200/18" />
-          Pittsburgh, PA
-        </span>
-        <span className="font-mono text-[0.5rem] tracking-[0.3em] uppercase text-terra/60 flex items-center gap-3">
-          Open to Opportunities
-          <span className="block w-8 h-px bg-terra/40" />
-        </span>
-      </div>
-
-      {/* Center — name block */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
+      {/* ── Left: name + subtitle ──────────────────────── */}
+      <div
+        className="flex-1 flex flex-col justify-end"
+        style={{ padding: "0 52px 8vh" }}
+      >
+        {/* Name */}
         <h1
-          className="font-display font-light tracking-[-0.03em] leading-[0.82] select-none"
-          style={{ fontSize: "clamp(5rem,15vw,18rem)" }}
+          className="reveal d1 select-none"
+          style={{
+            fontFamily: "Bebas Neue, sans-serif",
+            fontSize: "clamp(6rem, 13vw, 14rem)",
+            letterSpacing: "0.035em",
+            lineHeight: 0.88,
+            color: "var(--text)",
+          }}
         >
-          <span className="reveal d1 block text-cream-100">Andrew</span>
-          <span className="reveal d2 block" style={{ paddingBottom: "0.06em" }}>
-            <em className="not-italic text-cream-100/18">Coutinho</em>
-            <span className="text-terra">.</span>
-          </span>
+          Andrew
+          <br />
+          Coutinho
         </h1>
 
-        <p className="reveal d3 font-mono text-[0.54rem] tracking-[0.28em] uppercase text-cream-200/32 mt-7 flex items-center gap-4">
-          <span className="block w-6 h-px bg-cream-200/20" />
+        {/* Subtitle */}
+        <p
+          className="reveal d2"
+          style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontWeight: 300,
+            fontSize: "0.9rem",
+            letterSpacing: "0.04em",
+            color: "rgba(232,228,221,0.42)",
+            marginTop: "1.8rem",
+          }}
+        >
           Strategist&ensp;·&ensp;Founder&ensp;·&ensp;Aerial Photographer
         </p>
-      </div>
 
-      {/* Bottom row — brief + CTA */}
-      <div className="reveal d4 relative z-10 flex items-end justify-between">
-        <p className="font-body font-light text-[0.78rem] leading-[2] text-cream-200/35 max-w-[260px]">
-          Building at the intersection of creative media,<br />
+        {/* Brief */}
+        <p
+          className="reveal d3"
+          style={{
+            fontFamily: "DM Sans, sans-serif",
+            fontWeight: 300,
+            fontSize: "0.78rem",
+            lineHeight: 2,
+            color: "rgba(232,228,221,0.25)",
+            marginTop: "0.7rem",
+            maxWidth: 290,
+          }}
+        >
+          Building at the intersection of creative media,
+          <br />
           global community, and economic thinking.
         </p>
 
-        <div className="flex flex-col items-end gap-4">
-          {/* Animated scroll hint */}
-          <button
-            onClick={() => onScrollTo("about")}
-            data-cursor
-            className="flex flex-col items-center gap-2 group"
-            aria-label="Scroll down"
+        {/* Location tag */}
+        <p
+          className="reveal d4"
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "0.44rem",
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            color: "rgba(232,228,221,0.18)",
+            marginTop: "2.5rem",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ display: "block", width: 24, height: 1, background: "rgba(232,228,221,0.14)" }} />
+          Pittsburgh, PA · Open to Opportunities
+        </p>
+      </div>
+
+      {/* ── Right: photo placeholder ───────────────────── */}
+      <div
+        className="hidden md:flex flex-col justify-center"
+        style={{ padding: "0 52px 0 0", alignItems: "flex-end", minWidth: 280 }}
+      >
+        <div
+          className="reveal d2"
+          style={{
+            width: 230,
+            height: 295,
+            border: "1px solid var(--border-accent)",
+            background: "rgba(74,158,255,0.03)",
+            position: "relative",
+          }}
+        >
+          {/* Corner accents */}
+          {[
+            { top: -1, left: -1, borderTop: "1.5px solid var(--accent)", borderLeft: "1.5px solid var(--accent)" },
+            { top: -1, right: -1, borderTop: "1.5px solid var(--accent)", borderRight: "1.5px solid var(--accent)" },
+            { bottom: -1, left: -1, borderBottom: "1.5px solid var(--accent)", borderLeft: "1.5px solid var(--accent)" },
+            { bottom: -1, right: -1, borderBottom: "1.5px solid var(--accent)", borderRight: "1.5px solid var(--accent)" },
+          ].map((s, i) => (
+            <span
+              key={i}
+              style={{
+                position: "absolute",
+                width: 14,
+                height: 14,
+                ...s,
+              }}
+            />
+          ))}
+
+          {/* Placeholder label */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
           >
-            <span className="font-mono text-[0.44rem] tracking-[0.32em] uppercase text-cream-200/22
-                             group-hover:text-cream-200/45 transition-colors duration-300">
-              scroll
+            <span
+              style={{
+                fontFamily: "DM Mono, monospace",
+                fontSize: "0.42rem",
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                color: "rgba(232,228,221,0.18)",
+              }}
+            >
+              Andrew Coutinho
             </span>
-            <span className="block w-px h-10 bg-cream-200/15 relative overflow-hidden">
-              <span className="scroll-line absolute inset-0 bg-terra/60" />
-            </span>
-          </button>
+          </div>
         </div>
       </div>
+
+      {/* ── Scroll hint — bottom right ────────────────── */}
+      <button
+        onClick={() => onScrollTo("about")}
+        data-cursor
+        aria-label="Scroll down"
+        style={{
+          position: "absolute",
+          bottom: "7vh",
+          right: 52,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 6,
+          background: "none",
+          border: "none",
+          cursor: "none",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "DM Mono, monospace",
+            fontSize: "0.42rem",
+            letterSpacing: "0.32em",
+            textTransform: "uppercase",
+            color: "rgba(232,228,221,0.2)",
+          }}
+        >
+          scroll
+        </span>
+        <span
+          style={{
+            display: "block",
+            width: 1,
+            height: 38,
+            background: "rgba(232,228,221,0.12)",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <span
+            className="scroll-line"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "var(--accent)",
+            }}
+          />
+        </span>
+      </button>
     </section>
   );
 }

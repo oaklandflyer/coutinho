@@ -2,49 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── CSS variables (theming) ──────────────────────────── */
 :root {
-  --font-cormorant: "Cormorant", serif;
-  --font-outfit: "Outfit", sans-serif;
-  --font-jetbrains: "JetBrains Mono", monospace;
+  --bg: #0e0d0b;
+  --bg-panel: #1a1a1a;
+  --bg-panel2: #111110;
+  --text: #e8e4dd;
+  --text-dim: rgba(232, 228, 221, 0.5);
+  --text-faint: rgba(232, 228, 221, 0.22);
+  --accent: #4a9eff;
+  --accent2: #c8873a;
+  --border: rgba(232, 228, 221, 0.07);
+  --border-accent: rgba(74, 158, 255, 0.25);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+html.light {
+  --bg: #f0eeea;
+  --bg-panel: #e4e1da;
+  --bg-panel2: #ebe8e0;
+  --text: #1a1a18;
+  --text-dim: rgba(26, 26, 24, 0.55);
+  --text-faint: rgba(26, 26, 24, 0.28);
+  --accent: #1a6fd4;
+  --accent2: #a06828;
+  --border: rgba(26, 26, 24, 0.08);
+  --border-accent: rgba(26, 111, 212, 0.3);
 }
 
-html {
-  height: 100%;
-}
+/* ── Reset ─────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; background: var(--bg); }
 
 body {
   min-height: 100vh;
-  overflow-x: hidden;
-  background: #160f09;
-  color: #f4efe6;
-  font-family: "Outfit", sans-serif;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
   cursor: none;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* Hide scrollbar */
-::-webkit-scrollbar { display: none; }
-* { scrollbar-width: none; }
+/* ── Scroll container ───────────────────────────────────── */
+.scroll-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-container::-webkit-scrollbar { display: none; }
 
-/* Selection */
+/* ── Section base ───────────────────────────────────────── */
+.section-full {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Selection ──────────────────────────────────────────── */
 ::selection {
-  background: rgba(184, 85, 53, 0.25);
-  color: #f4efe6;
+  background: rgba(74, 158, 255, 0.22);
+  color: var(--text);
 }
 
-/* Cursor */
+/* ── Cursor ─────────────────────────────────────────────── */
 .cursor-dot {
   position: fixed;
   top: 0; left: 0;
   width: 5px; height: 5px;
   border-radius: 50%;
-  background: #d06b47;
+  background: var(--accent);
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
@@ -56,7 +89,7 @@ body {
   top: 0; left: 0;
   width: 30px; height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(184, 85, 53, 0.3);
+  border: 1px solid rgba(74, 158, 255, 0.28);
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
@@ -64,22 +97,16 @@ body {
 }
 
 body.hovering .cursor-dot  { width: 10px; height: 10px; }
-body.hovering .cursor-ring { width: 48px; height: 48px; border-color: rgba(208, 107, 71, 0.55); }
+body.hovering .cursor-ring { width: 48px; height: 48px; border-color: rgba(74, 158, 255, 0.5); }
 
-/* Section base — full viewport, no snap */
-.section-full {
-  min-height: 100vh;
-  position: relative;
-}
-
-/* Film grain overlay */
+/* ── Film grain ─────────────────────────────────────────── */
 .grain::after {
   content: "";
   position: fixed;
   inset: -50%;
   width: 200%;
   height: 200%;
-  opacity: 0.04;
+  opacity: 0.03;
   pointer-events: none;
   z-index: 9990;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
@@ -93,7 +120,7 @@ body.hovering .cursor-ring { width: 48px; height: 48px; border-color: rgba(208, 
   100% { transform: translate(0, 0); }
 }
 
-/* Reveal on scroll */
+/* ── Reveal on scroll ───────────────────────────────────── */
 .reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -110,19 +137,23 @@ body.hovering .cursor-ring { width: 48px; height: 48px; border-color: rgba(208, 
 .reveal.d4 { transition-delay: 0.44s; }
 .reveal.d5 { transition-delay: 0.6s; }
 
-/* fadeIn keyframe for chrome */
+/* ── Animations ─────────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-/* Scroll hint line */
+@keyframes chevronBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(5px); }
+}
+.chevron-bounce { animation: chevronBounce 1.6s ease-in-out infinite; }
+
+/* ── Scroll hint line (hero fallback) ───────────────────── */
 @keyframes scrollLine {
   0%   { transform: scaleY(0); transform-origin: top; }
   45%  { transform: scaleY(1); transform-origin: top; }
   55%  { transform: scaleY(1); transform-origin: bottom; }
   100% { transform: scaleY(0); transform-origin: bottom; }
 }
-.scroll-line {
-  animation: scrollLine 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
+.scroll-line { animation: scrollLine 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
