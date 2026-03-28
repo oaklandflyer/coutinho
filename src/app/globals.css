@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: "Cormorant", serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-jetbrains: "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  height: 100dvh;
+  background: #f4efe6;
+  color: #231a12;
+  font-family: "Outfit", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  cursor: none;
+}
+
+/* Custom scrollbar hide */
+::-webkit-scrollbar { display: none; }
+
+/* Selection */
+::selection {
+  background: rgba(184, 85, 53, 0.2);
+  color: #231a12;
+}
+
+/* Cursor */
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #b85535;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s;
+  mix-blend-mode: multiply;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(184, 85, 53, 0.4);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s;
+}
+
+body.hovering .cursor-dot  { width: 12px; height: 12px; }
+body.hovering .cursor-ring { width: 46px; height: 46px; border-color: #b85535; }
+
+/* Panel snap container */
+.snap-container {
+  height: 100dvh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+
+/* Section base */
+.section-snap {
+  height: 100dvh;
+  scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grain overlay */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  opacity: 0.032;
+  pointer-events: none;
+  z-index: 9990;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation: grain 0.4s steps(3) infinite;
+}
+
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  33%  { transform: translate(-1%, 1%); }
+  67%  { transform: translate(1%, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal.d1 { transition-delay: 0.08s; }
+.reveal.d2 { transition-delay: 0.18s; }
+.reveal.d3 { transition-delay: 0.30s; }
+.reveal.d4 { transition-delay: 0.44s; }
+.reveal.d5 { transition-delay: 0.58s; }
+
+/* Three.js canvas */
+.r3f-canvas {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+}
+
+/* Chevron animation */
+@keyframes chevronBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+.chevron-bounce { animation: chevronBounce 2.4s ease-in-out infinite; }
+
+/* Progress rail */
+.progress-rail { transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
