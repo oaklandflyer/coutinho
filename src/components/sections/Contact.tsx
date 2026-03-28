@@ -1,211 +1,65 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useReveal } from "@/lib/useReveal";
 
-const ctaButtons = [
-  { label: "Email Me", href: "mailto:coutinhodrew@gmail.com", primary: true },
-  { label: "LinkedIn", href: "https://linkedin.com/in/andrew-coutinho", primary: false },
-  { label: "Instagram", href: "https://instagram.com/asfvisuals", primary: false },
-  { label: "YouTube", href: "https://youtube.com/@ASFVisualsLLC", primary: false },
-];
-
-const details = [
-  { label: "Location", value: "Pittsburgh, PA" },
-  { label: "Email", value: "coutinhodrew@gmail.com" },
-  { label: "LinkedIn", value: "/in/andrew-coutinho" },
-  { label: "Open to", value: "PM · Marketing · Comms · Drone/Web" },
-  { label: "Compensation", value: "$85K+ · Also available for project work" },
-  { label: "Citizenship", value: "US / UK Citizen" },
+const links = [
+  { label: "Email",      sub: "coutinhodrew@gmail.com",    href: "mailto:coutinhodrew@gmail.com"         },
+  { label: "LinkedIn",   sub: "/in/andrew-coutinho",       href: "https://linkedin.com/in/andrew-coutinho" },
+  { label: "Instagram",  sub: "@asfvisuals",               href: "https://instagram.com/asfvisuals"      },
+  { label: "YouTube",    sub: "ASF Visuals LLC",           href: "https://youtube.com/@ASFVisualsLLC"    },
+  { label: "ASF Visuals",sub: "asfvisualsllc.com",         href: "https://asfvisualsllc.com"             },
 ];
 
 export default function Contact() {
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting)
-            e.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
-        }),
-      { threshold: 0.12 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+  const ref = useReveal();
 
   return (
     <section
       ref={ref}
-      className="section-full flex items-center"
-      style={{ background: "var(--bg-panel)", padding: "0 52px" }}
+      id="contact"
+      className="min-h-screen flex items-center px-10 md:px-14 py-28 bg-panel"
     >
-      <div
-        className="w-full grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20"
-        style={{ maxWidth: 1100, margin: "0 auto" }}
-      >
+      <div className="w-full max-w-3xl">
 
-        {/* ── Left: heading + CTA buttons ─────────────── */}
-        <div className="flex flex-col justify-center">
+        <p className="reveal font-mono text-[0.5rem] tracking-[0.32em] uppercase text-sky mb-8 flex items-center gap-2">
+          <span className="block w-5 h-px bg-sky" /> Contact
+        </p>
 
-          {/* Label */}
-          <p
-            className="reveal"
-            style={{
-              fontFamily: "DM Mono, monospace",
-              fontSize: "0.5rem",
-              letterSpacing: "0.32em",
-              textTransform: "uppercase",
-              color: "var(--accent)",
-              marginBottom: 24,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <span style={{ display: "block", width: 20, height: 1, background: "var(--accent)" }} />
-            Contact
-          </p>
+        <h2 className="reveal d1 font-display text-[clamp(3rem,7vw,8rem)] leading-none tracking-[0.04em] text-ink mb-12">
+          Let&apos;s build<br />
+          <span className="text-amber">something.</span>
+        </h2>
 
-          {/* Heading */}
-          <h2
-            className="reveal d1"
-            style={{
-              fontFamily: "Bebas Neue, sans-serif",
-              fontSize: "clamp(2.8rem, 6vw, 7rem)",
-              letterSpacing: "0.04em",
-              lineHeight: 0.92,
-              color: "var(--text)",
-              marginBottom: 36,
-            }}
-          >
-            Let&apos;s build<br />
-            <span style={{ color: "var(--accent2)" }}>something.</span>
-          </h2>
+        <p className="reveal d2 font-body font-light text-[0.85rem] text-ink/40 leading-loose mb-10 max-w-sm">
+          Open to product management, marketing ops, communications, and creative
+          media roles above <strong className="font-normal text-ink/65">$85K</strong>.
+          Also available for drone photography and web projects.
+        </p>
 
-          {/* Stacked CTAs */}
-          <div className="reveal d2" style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 320 }}>
-            {ctaButtons.map((btn) => (
-              <a
-                key={btn.label}
-                href={btn.href}
-                target={btn.href.startsWith("mailto") ? undefined : "_blank"}
-                rel={btn.href.startsWith("mailto") ? undefined : "noreferrer"}
-                data-cursor
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "13px 20px",
-                  fontFamily: "DM Sans, sans-serif",
-                  fontWeight: btn.primary ? 400 : 300,
-                  fontSize: "0.88rem",
-                  letterSpacing: "0.02em",
-                  color: btn.primary ? "#0e0d0b" : "var(--text)",
-                  background: btn.primary ? "var(--accent)" : "transparent",
-                  border: btn.primary ? "1px solid var(--accent)" : "1px solid var(--border)",
-                  textDecoration: "none",
-                  transition: "background 0.25s ease, border-color 0.25s ease, color 0.25s ease",
-                  cursor: "none",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  if (btn.primary) {
-                    el.style.background = "var(--accent-dark, #2a7fdf)";
-                  } else {
-                    el.style.borderColor = "rgba(232,228,221,0.25)";
-                    el.style.background = "rgba(232,228,221,0.04)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  if (btn.primary) {
-                    el.style.background = "var(--accent)";
-                  } else {
-                    el.style.borderColor = "var(--border)";
-                    el.style.background = "transparent";
-                  }
-                }}
-              >
-                <span>{btn.label}</span>
-                <span style={{ fontFamily: "DM Mono, monospace", fontSize: "0.8rem", opacity: 0.6 }}>↗</span>
-              </a>
-            ))}
-          </div>
-
-          {/* Footer */}
-          <p
-            className="reveal d4"
-            style={{
-              fontFamily: "DM Mono, monospace",
-              fontSize: "0.44rem",
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "var(--text-faint)",
-              marginTop: 36,
-            }}
-          >
-            Andrew Coutinho · Pittsburgh, PA · US / UK Citizen · {new Date().getFullYear()}
-          </p>
+        {/* Links */}
+        <div className="reveal d3 flex flex-col gap-2 max-w-sm">
+          {links.map((l) => (
+            <a
+              key={l.label}
+              href={l.href}
+              target={l.href.startsWith("mailto") ? undefined : "_blank"}
+              rel={l.href.startsWith("mailto") ? undefined : "noreferrer"}
+              className="flex items-center justify-between px-4 py-3 border border-ink/[0.08]
+                         hover:border-ink/20 hover:bg-ink/[0.03] transition-all duration-200 group"
+            >
+              <span className="font-body font-light text-[0.82rem] text-ink/60 group-hover:text-ink/90 transition-colors duration-200">
+                {l.label}
+              </span>
+              <span className="font-mono text-[0.46rem] tracking-[0.1em] text-ink/25">
+                {l.sub} ↗
+              </span>
+            </a>
+          ))}
         </div>
 
-        {/* ── Right: contact details ───────────────────── */}
-        <div className="flex flex-col justify-center">
-          <div className="reveal d2" style={{ display: "flex", flexDirection: "column" }}>
-            {details.map((d, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "110px 1fr",
-                  gap: 16,
-                  padding: "14px 0",
-                  borderBottom: "1px solid var(--border)",
-                  alignItems: "baseline",
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "DM Mono, monospace",
-                    fontSize: "0.48rem",
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "var(--text-faint)",
-                    flexShrink: 0,
-                  }}
-                >
-                  {d.label}
-                </span>
-                <span
-                  style={{
-                    fontFamily: "DM Sans, sans-serif",
-                    fontWeight: 300,
-                    fontSize: "0.84rem",
-                    color: "var(--text-dim)",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {d.value}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Availability note */}
-          <p
-            className="reveal d3"
-            style={{
-              fontFamily: "DM Sans, sans-serif",
-              fontWeight: 300,
-              fontSize: "0.78rem",
-              lineHeight: 1.9,
-              color: "var(--text-faint)",
-              marginTop: 20,
-            }}
-          >
-            Open to product management, marketing ops, communications, and creative media roles.
-            Also available for drone photography and web projects.
-          </p>
-        </div>
+        {/* Footer */}
+        <p className="reveal d4 font-mono text-[0.44rem] tracking-[0.22em] uppercase text-ink/14 mt-14">
+          Andrew Coutinho · Pittsburgh, PA · US / UK Citizen · {new Date().getFullYear()}
+        </p>
 
       </div>
     </section>
