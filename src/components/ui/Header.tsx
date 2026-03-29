@@ -2,15 +2,24 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const links = [
-  { label: "About",      href: "#about",      num: "01" },
-  { label: "Experience", href: "#experience", num: "02" },
-  { label: "Work",       href: "#work",       num: "03" },
-  { label: "Contact",    href: "#contact",    num: "04" },
+/* Matches the 6-section order in ImmersivePortfolio */
+const NAV = [
+  { label: "About",      num: "01", section: 1 },
+  { label: "Skills",     num: "02", section: 2 },
+  { label: "Experience", num: "03", section: 3 },
+  { label: "Work",       num: "04", section: 4 },
+  { label: "Contact",    num: "05", section: 5 },
 ];
 
+const SECTION_COUNT = 6;
+
+function scrollToSection(n: number) {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  window.scrollTo({ top: (n / (SECTION_COUNT - 1)) * total, behavior: "smooth" });
+}
+
 export default function Header() {
-  const [open, setOpen] = useState(false);
+  const [open,    setOpen]    = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -19,50 +28,53 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll when menu open
+  /* Lock body scroll while mobile menu is open */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const handleNav = (section: number) => {
+    setOpen(false);
+    scrollToSection(section);
+  };
+
   return (
     <>
       {/* ── Top bar ── */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-6 transition-all duration-500 ${
+        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 transition-all duration-500 ${
           scrolled || open ? "bg-bg/90 backdrop-blur-md" : ""
         }`}
       >
-        {/* Logo */}
-        <a
-          href="#hero"
-          onClick={() => setOpen(false)}
+        {/* Logo → scrolls to top */}
+        <button
+          onClick={() => handleNav(0)}
           className="font-body text-sm tracking-widest text-ink/45 hover:text-ink/80 transition-colors duration-300 relative z-50"
         >
           AC
-        </a>
+        </button>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex gap-8">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
+          {NAV.map((l) => (
+            <button
+              key={l.section}
+              onClick={() => scrollToSection(l.section)}
               className="font-mono text-[0.5rem] tracking-[0.26em] uppercase text-ink/25 hover:text-ink/65 transition-colors duration-300"
             >
               {l.label}
-            </a>
+            </button>
           ))}
         </nav>
 
-        {/* Hamburger – mobile only */}
+        {/* Hamburger */}
         <button
           className="md:hidden relative z-50 flex flex-col gap-[5px] p-2 -mr-2"
           onClick={() => setOpen((v) => !v)}
@@ -97,25 +109,41 @@ export default function Header() {
             transition={{ duration: 0.28 }}
             className="fixed inset-0 z-40 bg-bg flex flex-col items-center justify-center md:hidden"
           >
-            <nav className="flex flex-col items-center gap-8">
-              {links.map((l, i) => (
-                <motion.a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
+            <nav className="flex flex-col items-center gap-7">
+              {/* Home first */}
+              <motion.button
+                onClick={() => handleNav(0)}
+                initial={{ opacity: 0, y: 22 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ delay: 0.07, duration: 0.32 }}
+                className="group flex items-baseline gap-4"
+              >
+                <span className="font-mono text-[0.42rem] tracking-[0.25em] text-ink/20 group-hover:text-sky/60 transition-colors duration-200">
+                  00
+                </span>
+                <span className="font-display text-[clamp(2.8rem,13vw,5rem)] text-ink/80 group-hover:text-sky transition-colors duration-200 leading-none">
+                  Home
+                </span>
+              </motion.button>
+
+              {NAV.map((l, i) => (
+                <motion.button
+                  key={l.section}
+                  onClick={() => handleNav(l.section)}
                   initial={{ opacity: 0, y: 22 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  transition={{ delay: 0.07 + i * 0.07, duration: 0.32 }}
+                  transition={{ delay: 0.1 + i * 0.07, duration: 0.32 }}
                   className="group flex items-baseline gap-4"
                 >
                   <span className="font-mono text-[0.42rem] tracking-[0.25em] text-ink/20 group-hover:text-sky/60 transition-colors duration-200">
                     {l.num}
                   </span>
-                  <span className="font-display text-[clamp(3rem,14vw,5.5rem)] text-ink/80 group-hover:text-sky transition-colors duration-200 leading-none">
+                  <span className="font-display text-[clamp(2.8rem,13vw,5rem)] text-ink/80 group-hover:text-sky transition-colors duration-200 leading-none">
                     {l.label}
                   </span>
-                </motion.a>
+                </motion.button>
               ))}
             </nav>
 
@@ -123,7 +151,7 @@ export default function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ delay: 0.38 }}
+              transition={{ delay: 0.45 }}
               className="absolute bottom-10 font-mono text-[0.42rem] tracking-[0.28em] uppercase text-ink/18"
             >
               Andrew Coutinho · Pittsburgh, PA

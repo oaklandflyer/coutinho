@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Base ── */
 html {
-  scroll-behavior: smooth;
+  /* No smooth-scroll – we handle camera interpolation in Three.js */
+  scroll-behavior: auto;
 }
 
 body {
@@ -15,17 +17,31 @@ body {
   overflow-x: hidden;
 }
 
-/* Hide scrollbar */
+/* ── Hide all scrollbars (immersive layout) ── */
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }
 
-/* Selection */
-::selection { background: rgba(74, 158, 255, 0.2); }
+/* ── Selection ── */
+::selection { background: rgba(74, 158, 255, 0.18); }
 
-/* ── Reveal on scroll ── */
+/* ── Three.js canvas always fills its container ── */
+canvas {
+  display: block;
+  width:  100% !important;
+  height: 100% !important;
+}
+
+/* ── Panel glass card – the floating content overlay ── */
+.panel-scroll {
+  /* Enables independent scroll inside the panel on mobile
+     without fighting the page-level scroll driver          */
+  overscroll-behavior: contain;
+}
+
+/* ── Reveal (kept for any legacy uses) ── */
 .reveal {
   opacity: 0;
-  transform: translateY(22px);
+  transform: translateY(20px);
   transition:
     opacity   0.9s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
@@ -35,24 +51,3 @@ body {
 .reveal.d2      { transition-delay: 0.22s; }
 .reveal.d3      { transition-delay: 0.36s; }
 .reveal.d4      { transition-delay: 0.52s; }
-
-/* ── Scroll bounce indicator ── */
-@keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); opacity: 0.25; }
-  50%       { transform: translateY(6px); opacity: 0.5; }
-}
-.scroll-bounce {
-  animation: scrollBounce 2s ease-in-out infinite;
-}
-
-/* ── Modal scroll lock helper ── */
-body.modal-open {
-  overflow: hidden;
-}
-
-/* ── Three.js canvas fill ── */
-canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
