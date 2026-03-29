@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Andrew Coutinho — Strategist & Creative Director",
+  title: "Andrew Coutinho — Product Manager & Creative Strategist",
   description:
-    "Strategist, founder, and aerial photographer based in Pittsburgh, PA. " +
-    "Vice Curator of Global Shapers Pittsburgh (WEF). Founder of ASF Visuals LLC.",
+    "Product Manager, strategist, and founder based in Pittsburgh, PA. " +
+    "Curator-elect of Global Shapers Pittsburgh (WEF). Founder of ASF Visuals LLC. " +
+    "FAA Part 107 licensed aerial photographer. Open to PM and creative ops roles.",
+  keywords: [
+    "Andrew Coutinho", "Product Manager", "Pittsburgh", "WEF", "Global Shapers",
+    "ASF Visuals", "Drone Photography", "Strategist", "Fulbright",
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

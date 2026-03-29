@@ -27,14 +27,14 @@ const jobs = [
     yr:    "Jul — Aug 2023",
     title: "Cyber Security Analyst",
     org:   "Robin Home Care · London, UK",
-    note:  "Secured sensitive data per UK regulations. VPN and password management systems company-wide.",
+    note:  "Secured sensitive data per UK regulations. Deployed VPN and password management systems company-wide.",
     tags:  ["Security"],
   },
   {
     yr:    "Jan 2022 — Nov 2024",
     title: "Founder & President",
     org:   "Bodybuilding Club at Pitt / NCBO",
-    note:  "0 → 100+ members, 200% social media growth. Co-founded NCBO connecting 10+ universities.",
+    note:  "0 → 100+ members, 200% social media growth. Co-founded NCBO connecting 10+ universities across the Northeast.",
     tags:  ["Founding", "Growth"],
   },
 ];
@@ -46,10 +46,9 @@ export default function Experience() {
     <section
       ref={ref}
       id="experience"
-      className="min-h-screen flex items-center px-10 md:px-14 py-28 bg-panel"
+      className="min-h-screen flex items-center px-6 md:px-14 py-28 bg-panel"
     >
       <div className="w-full max-w-5xl mx-auto">
-
         <p className="reveal font-mono text-[0.5rem] tracking-[0.32em] uppercase text-sky mb-8 flex items-center gap-2">
           <span className="block w-5 h-px bg-sky" /> Experience
         </p>
@@ -62,12 +61,11 @@ export default function Experience() {
           {jobs.map((j, i) => (
             <div
               key={i}
-              className="reveal border-b border-ink/[0.07] py-6 grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr_auto] gap-x-5 gap-y-3 items-start
-                         hover:bg-ink/[0.02] -mx-3 px-3 transition-colors duration-300"
+              className="reveal border-b border-ink/[0.07] py-6 grid grid-cols-[90px_1fr] md:grid-cols-[130px_1fr_auto] gap-x-5 gap-y-3 items-start hover:bg-ink/[0.025] -mx-3 px-3 transition-colors duration-300"
               style={{ transitionDelay: `${i * 0.05}s` }}
             >
               {/* Year */}
-              <span className="font-mono text-[0.48rem] text-ink/20 pt-1 leading-relaxed">
+              <span className="font-mono text-[0.46rem] text-ink/20 pt-1 leading-relaxed break-words">
                 {j.yr}
               </span>
 
@@ -76,10 +74,10 @@ export default function Experience() {
                 <div className="font-body font-normal text-[1.05rem] text-ink mb-1 leading-snug">
                   {j.title}
                 </div>
-                <div className="font-mono text-[0.48rem] uppercase tracking-[0.1em] text-sky mb-2">
+                <div className="font-mono text-[0.46rem] uppercase tracking-[0.1em] text-sky mb-2.5">
                   {j.org}
                 </div>
-                <div className="font-body font-light text-[0.8rem] text-ink/40 leading-[1.8]">
+                <div className="font-body font-light text-[0.8rem] text-ink/40 leading-[1.8] max-w-xl">
                   {j.note}
                 </div>
               </div>
@@ -98,7 +96,6 @@ export default function Experience() {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

@@ -22,7 +22,7 @@ body {
 /* Selection */
 ::selection { background: rgba(74, 158, 255, 0.2); }
 
-/* Reveal on scroll */
+/* ── Reveal on scroll ── */
 .reveal {
   opacity: 0;
   transform: translateY(22px);
@@ -30,8 +30,29 @@ body {
     opacity   0.9s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.reveal.visible          { opacity: 1; transform: none; }
-.reveal.d1               { transition-delay: 0.1s; }
-.reveal.d2               { transition-delay: 0.22s; }
-.reveal.d3               { transition-delay: 0.36s; }
-.reveal.d4               { transition-delay: 0.52s; }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal.d1      { transition-delay: 0.10s; }
+.reveal.d2      { transition-delay: 0.22s; }
+.reveal.d3      { transition-delay: 0.36s; }
+.reveal.d4      { transition-delay: 0.52s; }
+
+/* ── Scroll bounce indicator ── */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.25; }
+  50%       { transform: translateY(6px); opacity: 0.5; }
+}
+.scroll-bounce {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* ── Modal scroll lock helper ── */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* ── Three.js canvas fill ── */
+canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
