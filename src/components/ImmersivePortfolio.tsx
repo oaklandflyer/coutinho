@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const WorldScene = dynamic(() => import("@/components/3d/WorldScene"), {
+const SceneBackground = dynamic(() => import("@/components/3d/SceneBackground"), {
   ssr: false,
   loading: () => null,
 });
@@ -40,7 +40,7 @@ function useScrollProgress() {
 /* ─── Panel chrome ─────────────────────────────────────────── */
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="font-mono text-[0.48rem] tracking-[0.32em] uppercase text-sky mb-5 flex items-center gap-2">
+    <p className="font-mono text-[0.6rem] md:text-[0.48rem] tracking-[0.32em] uppercase text-sky mb-5 flex items-center gap-2">
       <span className="block w-4 h-px bg-sky" />
       {children}
     </p>
@@ -50,7 +50,7 @@ function SectionLabel({ children }: { children: string }) {
 function Tag({ children, color = "sky" }: { children: string; color?: "sky" | "amber" }) {
   return (
     <span
-      className={`font-mono text-[0.42rem] tracking-[0.08em] uppercase px-2.5 py-1.5 border transition-colors duration-200 ${
+      className={`font-mono text-[0.55rem] md:text-[0.42rem] tracking-[0.08em] uppercase px-2.5 py-1.5 border transition-colors duration-200 ${
         color === "sky"
           ? "border-sky/15 text-ink/35 hover:border-sky/40 hover:text-ink/65"
           : "border-amber/15 text-ink/35 hover:border-amber/40 hover:text-ink/65"
@@ -65,7 +65,7 @@ function Tag({ children, color = "sky" }: { children: string; color?: "sky" | "a
 function HeroPanel({ scrollTo }: { scrollTo: (n: number) => void }) {
   return (
     <div>
-      <p className="font-mono text-[0.44rem] uppercase tracking-[0.32em] text-sky/65 mb-5 flex items-center gap-3">
+      <p className="font-mono text-[0.6rem] md:text-[0.44rem] uppercase tracking-[0.32em] text-sky/65 mb-5 flex items-center gap-3">
         <span className="block w-5 h-px bg-sky/40" />
         Product Manager · Strategist · Creative Director
       </p>
@@ -85,19 +85,19 @@ function HeroPanel({ scrollTo }: { scrollTo: (n: number) => void }) {
       <div className="flex flex-wrap gap-3 mb-10">
         <button
           onClick={() => scrollTo(4)}
-          className="font-mono text-[0.48rem] tracking-[0.2em] uppercase px-5 py-3 bg-sky text-bg hover:bg-sky/80 transition-colors duration-200"
+          className="font-mono text-[0.65rem] md:text-[0.48rem] tracking-[0.2em] uppercase px-5 py-3 bg-sky text-bg hover:bg-sky/80 transition-colors duration-200"
         >
           See Work ↓
         </button>
         <button
           onClick={() => scrollTo(5)}
-          className="font-mono text-[0.48rem] tracking-[0.2em] uppercase px-5 py-3 border border-ink/20 text-ink/50 hover:text-ink/80 hover:border-ink/40 transition-colors duration-200"
+          className="font-mono text-[0.65rem] md:text-[0.48rem] tracking-[0.2em] uppercase px-5 py-3 border border-ink/20 text-ink/50 hover:text-ink/80 hover:border-ink/40 transition-colors duration-200"
         >
           Get in Touch
         </button>
       </div>
 
-      <p className="font-mono text-[0.44rem] uppercase tracking-[0.3em] text-ink/14 flex items-center gap-3">
+      <p className="font-mono text-[0.55rem] md:text-[0.44rem] uppercase tracking-[0.3em] text-ink/14 flex items-center gap-3">
         <span className="block w-5 h-px bg-ink/10" />
         Pittsburgh, PA · Open to Opportunities
       </p>
@@ -137,7 +137,7 @@ function AboutPanel() {
         <strong className="font-medium text-ink/80">Fulbright-Hays Scholar</strong>, Tanzania 2023.
       </p>
 
-      <p className="font-mono text-[0.48rem] tracking-[0.28em] uppercase text-sky mt-6 mb-3 flex items-center gap-2">
+      <p className="font-mono text-[0.6rem] md:text-[0.48rem] tracking-[0.28em] uppercase text-sky mt-6 mb-3 flex items-center gap-2">
         <span className="block w-4 h-px bg-sky" /> Education
       </p>
       <div className="flex flex-col gap-2 mb-6">
@@ -149,11 +149,11 @@ function AboutPanel() {
         ))}
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {stats.map((s) => (
           <div key={s.n} className="p-3 border border-ink/[0.07] bg-bg/50">
             <div className="font-display text-[1.8rem] text-amber leading-none mb-1">{s.n}</div>
-            <div className="font-mono text-[0.4rem] tracking-[0.15em] uppercase text-ink/22 whitespace-pre-line leading-relaxed">{s.l}</div>
+            <div className="font-mono text-[0.52rem] md:text-[0.4rem] tracking-[0.15em] uppercase text-ink/22 whitespace-pre-line leading-relaxed">{s.l}</div>
           </div>
         ))}
       </div>
@@ -191,7 +191,7 @@ function SkillsPanel() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {skillSets.map((cat) => (
           <div key={cat.label}>
-            <p className={`font-mono text-[0.44rem] tracking-[0.2em] uppercase mb-2.5 flex items-center gap-2 ${cat.color === "sky" ? "text-sky" : "text-amber"}`}>
+            <p className={`font-mono text-[0.58rem] md:text-[0.44rem] tracking-[0.2em] uppercase mb-2.5 flex items-center gap-2 ${cat.color === "sky" ? "text-sky" : "text-amber"}`}>
               <span className={`block w-4 h-px ${cat.color === "sky" ? "bg-sky" : "bg-amber"}`} />
               {cat.label}
             </p>
@@ -255,11 +255,11 @@ function ExperiencePanel() {
       </h2>
       <div className="flex flex-col divide-y divide-ink/[0.07]">
         {jobs.map((j, i) => (
-          <div key={i} className="py-4 grid grid-cols-[80px_1fr] gap-x-4 items-start">
-            <span className="font-mono text-[0.42rem] text-ink/18 leading-relaxed mt-0.5">{j.yr}</span>
+          <div key={i} className="py-4 grid grid-cols-[56px_1fr] md:grid-cols-[80px_1fr] gap-x-3 md:gap-x-4 items-start">
+            <span className="font-mono text-[0.5rem] md:text-[0.42rem] text-ink/18 leading-relaxed mt-0.5">{j.yr}</span>
             <div>
               <div className="font-body text-[0.95rem] text-ink mb-0.5">{j.title}</div>
-              <div className="font-mono text-[0.44rem] uppercase tracking-[0.1em] text-sky mb-1">{j.org}</div>
+              <div className="font-mono text-[0.55rem] md:text-[0.44rem] uppercase tracking-[0.1em] text-sky mb-1">{j.org}</div>
               <div className="font-body font-light text-[0.76rem] text-ink/38 leading-[1.75]">{j.note}</div>
             </div>
           </div>
@@ -489,7 +489,7 @@ function WorkPanel() {
             >
               <span className="font-mono text-[0.44rem] text-ink/18 w-7 shrink-0">{p.n}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-mono text-[0.42rem] uppercase tracking-[0.12em] text-amber/60 mb-0.5">{p.category}</p>
+                <p className="font-mono text-[0.55rem] md:text-[0.42rem] uppercase tracking-[0.12em] text-amber/60 mb-0.5">{p.category}</p>
                 <p className={`font-body text-ink group-hover:text-sky transition-colors duration-200 leading-snug ${p.featured ? "text-[1.05rem]" : "text-[0.92rem]"}`}>{p.title}</p>
               </div>
               <span className="text-sky/28 group-hover:text-sky/70 transition-colors text-sm shrink-0">↗</span>
@@ -577,26 +577,55 @@ export default function ImmersivePortfolio() {
 
       {/* ── Fixed 3D canvas – full screen background ── */}
       <div className="fixed inset-0 z-0">
-        <WorldScene />
+        <SceneBackground />
       </div>
 
-      {/* ── Content panel – left on desktop, bottom on mobile ── */}
-      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-0 md:right-auto md:w-[46%] z-10 flex items-end md:items-center px-4 pb-6 md:px-12 md:pb-0 pointer-events-none">
-        <div className="w-full max-h-[62vh] md:max-h-[80vh] overflow-y-auto pointer-events-auto panel-scroll">
+      {/* ── Content panel – left on desktop, bottom sheet on mobile ── */}
+      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-0 md:right-auto md:w-[46%] z-10 flex items-end md:items-center px-3 pb-4 md:px-12 md:pb-0 pointer-events-none">
+        <div className="w-full max-h-[72vh] md:max-h-[80vh] overflow-y-auto pointer-events-auto panel-scroll">
           {/* Glass card */}
-          <div className="bg-bg/80 backdrop-blur-2xl border border-ink/[0.07] p-6 md:p-8">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSection}
-                variants={panelVariants}
-                initial="enter"
-                animate="show"
-                exit="exit"
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {panels[activeSection]}
-              </motion.div>
-            </AnimatePresence>
+          <div className="bg-bg/80 backdrop-blur-2xl border border-ink/[0.07] md:border">
+
+            {/* ── Mobile drag handle ── */}
+            <div className="flex justify-center pt-2.5 pb-0 md:hidden">
+              <div className="w-9 h-1 rounded-full bg-ink/20" />
+            </div>
+
+            {/* ── Mobile section dots + counter ── */}
+            <div className="flex items-center justify-between px-6 pt-3 pb-0 md:hidden">
+              <div className="flex gap-2.5">
+                {SECTION_LABELS.map((label, i) => (
+                  <button
+                    key={i}
+                    onClick={() => scrollToSection(i)}
+                    aria-label={label}
+                    className={`rounded-full transition-all duration-300 ${
+                      activeSection === i ? "w-5 h-1.5 bg-sky" : "w-1.5 h-1.5 bg-ink/22"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="font-mono text-[0.5rem] tracking-[0.2em] text-ink/22">
+                0{activeSection + 1}&thinsp;/&thinsp;0{N}
+              </span>
+            </div>
+
+            {/* ── Panel content ── */}
+            <div className="p-6 md:p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeSection}
+                  variants={panelVariants}
+                  initial="enter"
+                  animate="show"
+                  exit="exit"
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {panels[activeSection]}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
           </div>
         </div>
       </div>
@@ -639,20 +668,6 @@ export default function ImmersivePortfolio() {
             </p>
           </motion.div>
         </AnimatePresence>
-      </div>
-
-      {/* ── Mobile: section dots along top (below header) ── */}
-      <div className="fixed top-16 left-1/2 -translate-x-1/2 z-20 flex gap-2.5 md:hidden">
-        {SECTION_LABELS.map((label, i) => (
-          <button
-            key={i}
-            onClick={() => scrollToSection(i)}
-            aria-label={label}
-            className={`rounded-full transition-all duration-300 ${
-              activeSection === i ? "w-5 h-1.5 bg-sky" : "w-1.5 h-1.5 bg-ink/22"
-            }`}
-          />
-        ))}
       </div>
 
       {/* ── Progress bar – very bottom ── */}
