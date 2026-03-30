@@ -1,21 +1,17 @@
 // ─── SceneBackground.tsx ──────────────────────────────────────────────────
 //
-// This is the SWAP POINT for the 3D background scene.
+// SWAP POINT — change the one export line below to switch scenes.
 //
-// TO USE YOUR OWN VR MOUNTAINSCAPE (or any custom Three.js scene):
+// Current scene:  MountainScene  (aurora + procedural mountains + mist)
+// Alt scene:      WorldScene     (starfield + nebulae + floating shapes)
 //
-//   1. Create your scene component in this folder, e.g.:
-//        src/components/3d/MountainScene.tsx
+// To build your own scene, create a new file in this folder, then:
+//   export { default } from "@/components/3d/YourScene";
 //
-//   2. Your component must:
-//        - Render a <Canvas> that fills its container
-//            style={{ width: "100%", height: "100%" }}
-//        - Listen to window.scrollY to drive camera position along a path
-//            (see WorldScene.tsx → CameraRig for the scroll → spline pattern)
-//        - Handle window.mousemove / window.touchmove for parallax if desired
-//
-//   3. Change the export below to point at your new component:
-//        export { default } from "@/components/3d/MountainScene";
+// Requirements for a custom scene component:
+//   - Renders a <Canvas style={{ width:"100%", height:"100%" }}>
+//   - Listens to window.scrollY inside useFrame (see CameraRig in each scene)
+//   - Uses THREE.CatmullRomCurve3 WAYPOINTS with the same 6 section order
 //
 // ─────────────────────────────────────────────────────────────────────────
-export { default } from "@/components/3d/WorldScene";
+export { default } from "@/components/3d/MountainScene";
