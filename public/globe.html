@@ -1,0 +1,680 @@
+<!-- Culture Flow Globe | Andrew Coutinho Portfolio -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Culture Flow Globe — Andrew Coutinho</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Raleway:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --cream: #f4ecd8;
+      --amber: #c8a84b;
+      --terra: #d4956a;
+      --cool: #8ab4c0;
+      --dim: rgba(244, 236, 216, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--cream);
+      font-family: 'Raleway', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    .globe-stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+
+    .globe-canvas {
+      display: block;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .globe-canvas.dragging { cursor: grabbing; }
+
+    .globe-hint {
+      position: absolute;
+      bottom: 1.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .city-panel {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, calc(-100% - 14px)) scale(0.96);
+      transform-origin: center bottom;
+      transition: opacity 0.24s ease, transform 0.24s ease;
+      min-width: 220px;
+      max-width: 280px;
+      padding: 0.85rem 1.05rem 0.95rem;
+      background: rgba(13, 13, 13, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(200, 168, 75, 0.28);
+      border-radius: 2px;
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(200, 168, 75, 0.04) inset;
+      z-index: 5;
+    }
+
+    .city-panel.visible {
+      opacity: 1;
+      transform: translate(-50%, calc(-100% - 18px)) scale(1);
+    }
+
+    .city-panel::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      width: 8px;
+      height: 8px;
+      transform: translateX(-50%) rotate(45deg);
+      background: rgba(13, 13, 13, 0.82);
+      border-right: 1px solid rgba(200, 168, 75, 0.28);
+      border-bottom: 1px solid rgba(200, 168, 75, 0.28);
+    }
+
+    .city-panel .eyebrow {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 400;
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.35rem;
+    }
+
+    .city-panel .name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: 1.35rem;
+      line-height: 1.15;
+      color: var(--cream);
+      margin-bottom: 0.35rem;
+    }
+
+    .city-panel .note {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: rgba(244, 236, 216, 0.78);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .city-panel { transition: opacity 0.1s ease; }
+    }
+  </style>
+</head>
+<body>
+  <div class="globe-stage" id="stage">
+    <canvas class="globe-canvas" id="globe" aria-label="Interactive globe of Andrew Coutinho's cities"></canvas>
+    <div class="city-panel" id="panel" role="tooltip" aria-live="polite">
+      <div class="eyebrow" id="panel-eyebrow">City</div>
+      <div class="name" id="panel-name"></div>
+      <div class="note" id="panel-note"></div>
+    </div>
+    <div class="globe-hint" id="hint">drag to spin · hover a city</div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Configuration ----------
+  const CITIES = [
+    { id: 'pit', name: 'Pittsburgh',    region: 'Pennsylvania, USA',     lat: 40.4406, lon: -79.9959, tint: 'amber', note: 'Home base. ASF Visuals LLC. Global Shapers Hub.' },
+    { id: 'lon', name: 'London',        region: 'Hanwell, W7',           lat: 51.5074, lon:  -0.1278, tint: 'cool',  note: 'Family base. UK admin. Robin Home Care.' },
+    { id: 'nbo', name: 'Nairobi',       region: 'Kenya',                  lat: -1.2921, lon:  36.8219, tint: 'terra', note: 'Global Shapers network. Pan-African culture.' },
+    { id: 'dar', name: 'Dar es Salaam', region: 'Tanzania',               lat: -6.7924, lon:  39.2083, tint: 'terra', note: 'Fulbright-Hays fieldwork. Africana Studies research.' },
+    { id: 'gva', name: 'Geneva',        region: 'Switzerland',            lat: 46.2044, lon:   6.1432, tint: 'amber', note: 'WEF Annual Gathering. June 30 arrival.' },
+    { id: 'edi', name: 'Edinburgh',     region: 'Scotland',               lat: 55.9533, lon:  -3.1883, tint: 'cool',  note: 'St Andrews golf trip. Highlands base. Jack.' },
+    { id: 'nyc', name: 'New York',      region: 'New York, USA',          lat: 40.7128, lon: -74.0060, tint: 'amber', note: 'NCBO national network. East Coast Retreat.' },
+    { id: 'los', name: 'Lagos',         region: 'Nigeria',                lat:  6.5244, lon:   3.3792, tint: 'terra', note: 'Afrobeats. Cultural research thread.' },
+  ];
+
+  const ARCS = [
+    ['pit','lon'], ['pit','nyc'], ['lon','gva'], ['lon','edi'],
+    ['lon','nbo'], ['nbo','dar'], ['gva','edi'], ['pit','los'],
+    ['nyc','lon'],
+  ];
+
+  const TINTS = {
+    amber: { r: 200, g: 168, b:  75 },
+    terra: { r: 212, g: 149, b: 106 },
+    cool:  { r: 138, g: 180, b: 192 },
+  };
+
+  // ---------- Canvas setup ----------
+  const canvas = document.getElementById('globe');
+  const ctx    = canvas.getContext('2d');
+  const panel  = document.getElementById('panel');
+  const panelEyebrow = document.getElementById('panel-eyebrow');
+  const panelName    = document.getElementById('panel-name');
+  const panelNote    = document.getElementById('panel-note');
+  const hint   = document.getElementById('hint');
+
+  let dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  let cssSize = 0;
+  let R = 0;      // globe radius in CSS pixels
+  let cx = 0, cy = 0;
+
+  function resize() {
+    dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    cssSize = Math.min(window.innerWidth, window.innerHeight) * 0.85;
+    canvas.style.width  = cssSize + 'px';
+    canvas.style.height = cssSize + 'px';
+    canvas.width  = Math.round(cssSize * dpr);
+    canvas.height = Math.round(cssSize * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = cssSize / 2;
+    cy = cssSize / 2;
+    R  = cssSize * 0.44;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---------- Math helpers ----------
+  const DEG = Math.PI / 180;
+
+  function latLonToVec(lat, lon) {
+    const phi = lat * DEG;
+    const lam = lon * DEG;
+    return {
+      x: Math.cos(phi) * Math.sin(lam),
+      y: Math.sin(phi),
+      z: Math.cos(phi) * Math.cos(lam),
+    };
+  }
+
+  // yaw around Y, pitch around X (clamped)
+  function rotate(v, yaw, pitch) {
+    const cy_ = Math.cos(yaw), sy_ = Math.sin(yaw);
+    const x1 =  v.x * cy_ + v.z * sy_;
+    const z1 = -v.x * sy_ + v.z * cy_;
+    const y1 =  v.y;
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const y2 = y1 * cp - z1 * sp;
+    const z2 = y1 * sp + z1 * cp;
+    return { x: x1, y: y2, z: z2 };
+  }
+
+  function project(v, radius) {
+    return {
+      x: cx + v.x * radius,
+      y: cy - v.y * radius,
+      z: v.z,
+    };
+  }
+
+  // Spherical linear interpolation of unit vectors, with optional lift.
+  function slerpLift(a, b, t, lift) {
+    const dot = Math.max(-1, Math.min(1, a.x*b.x + a.y*b.y + a.z*b.z));
+    const omega = Math.acos(dot);
+    const so = Math.sin(omega);
+    let vx, vy, vz;
+    if (so < 1e-6) {
+      vx = a.x; vy = a.y; vz = a.z;
+    } else {
+      const wa = Math.sin((1 - t) * omega) / so;
+      const wb = Math.sin(t * omega) / so;
+      vx = a.x * wa + b.x * wb;
+      vy = a.y * wa + b.y * wb;
+      vz = a.z * wa + b.z * wb;
+    }
+    // Lift off the sphere: magnitude rises then falls.
+    const m = 1 + lift * Math.sin(Math.PI * t);
+    return { x: vx * m, y: vy * m, z: vz * m };
+  }
+
+  // ---------- Precompute city vectors ----------
+  CITIES.forEach(c => {
+    c.vec = latLonToVec(c.lat, c.lon);
+  });
+
+  const cityById = Object.fromEntries(CITIES.map(c => [c.id, c]));
+
+  // Precompute arc objects with per-arc geometry settings and particles.
+  const arcs = ARCS.map(([aId, bId], i) => {
+    const a = cityById[aId], b = cityById[bId];
+    const dot = a.vec.x*b.vec.x + a.vec.y*b.vec.y + a.vec.z*b.vec.z;
+    const angle = Math.acos(Math.max(-1, Math.min(1, dot)));
+    // Bigger arcs ride higher.
+    const lift = 0.12 + 0.22 * (angle / Math.PI);
+    // Mix tints of the two endpoints for particle colour.
+    const ta = TINTS[a.tint], tb = TINTS[b.tint];
+    const tint = {
+      r: Math.round((ta.r + tb.r) / 2),
+      g: Math.round((ta.g + tb.g) / 2),
+      b: Math.round((ta.b + tb.b) / 2),
+    };
+    const particles = [];
+    const pcount = 3;
+    for (let p = 0; p < pcount; p++) {
+      particles.push({
+        t: (p / pcount + i * 0.17) % 1,
+        speed: 0.00028 + (i % 3) * 0.00008 + Math.random() * 0.00006,
+      });
+    }
+    return { a, b, angle, lift, tint, particles, segCount: 60 };
+  });
+
+  // ---------- Interaction state ----------
+  let yaw   = 0.35;    // center on ~20°W, mid-Atlantic
+  let pitch = 0.22;    // tilt northern hemisphere toward viewer
+  let autoRotate = true;
+  const autoSpeed = 0.0012;  // radians per ms-ish, scaled by dt
+
+  let dragging = false;
+  let lastX = 0, lastY = 0;
+  let resumeTimer = null;
+  let hoveredCity = null;
+  let hoveredScreen = null;
+  let mouseCSS = { x: -1, y: -1, inside: false };
+  let hintHidden = false;
+
+  function scheduleResume() {
+    if (resumeTimer) clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(() => { autoRotate = true; }, 2500);
+  }
+
+  function pointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const pt = (e.touches && e.touches[0]) ? e.touches[0] : e;
+    return { x: pt.clientX - rect.left, y: pt.clientY - rect.top, cx: pt.clientX, cy: pt.clientY };
+  }
+
+  function onDown(e) {
+    dragging = true;
+    autoRotate = false;
+    canvas.classList.add('dragging');
+    const p = pointerPos(e);
+    lastX = p.x; lastY = p.y;
+    if (!hintHidden) { hint.style.opacity = '0'; hintHidden = true; }
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    const p = pointerPos(e);
+    mouseCSS.x = p.x;
+    mouseCSS.y = p.y;
+    mouseCSS.inside = true;
+
+    if (dragging) {
+      const dx = p.x - lastX;
+      const dy = p.y - lastY;
+      lastX = p.x; lastY = p.y;
+      yaw   += dx * 0.005;
+      pitch += dy * 0.005;
+      // Clamp pitch so poles do not flip.
+      const limit = Math.PI / 2 - 0.12;
+      if (pitch >  limit) pitch =  limit;
+      if (pitch < -limit) pitch = -limit;
+    }
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    canvas.classList.remove('dragging');
+    scheduleResume();
+  }
+
+  function onLeave() {
+    mouseCSS.inside = false;
+    if (dragging) onUp();
+  }
+
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup',   onUp);
+  canvas.addEventListener('mouseleave', onLeave);
+
+  canvas.addEventListener('touchstart', onDown, { passive: false });
+  canvas.addEventListener('touchmove',  (e) => { onMove(e); e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchend',   onUp);
+  canvas.addEventListener('touchcancel', onUp);
+
+  // ---------- Drawing ----------
+  function drawAtmosphere() {
+    const grad = ctx.createRadialGradient(cx, cy, R * 0.98, cx, cy, R * 1.22);
+    grad.addColorStop(0.0, 'rgba(200, 160, 80, 0.18)');
+    grad.addColorStop(0.4, 'rgba(200, 160, 80, 0.09)');
+    grad.addColorStop(1.0, 'rgba(200, 160, 80, 0.00)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawGlobeFill() {
+    // Base sphere, very slightly lifted toward the light on the upper-left.
+    const grad = ctx.createRadialGradient(
+      cx - R * 0.35, cy - R * 0.35, R * 0.05,
+      cx, cy, R * 1.02
+    );
+    grad.addColorStop(0.0, '#1a1814');
+    grad.addColorStop(0.55, '#0f0f0e');
+    grad.addColorStop(1.0, '#0a0a0a');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner rim stroke for definition.
+    ctx.strokeStyle = 'rgba(200, 160, 80, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+
+    const samples = 90;
+
+    // Parallels (lat lines)
+    for (let lat = -75; lat <= 75; lat += 15) {
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i <= samples; i++) {
+        const lon = -180 + (360 * i) / samples;
+        const v = rotate(latLonToVec(lat, lon), yaw, pitch);
+        if (v.z > 0) {
+          const p = project(v, R);
+          if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+          else          { ctx.lineTo(p.x, p.y); }
+        } else {
+          started = false;
+        }
+      }
+      ctx.stroke();
+    }
+
+    // Meridians (lon lines)
+    for (let lon = -180; lon < 180; lon += 15) {
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i <= samples; i++) {
+        const lat = -90 + (180 * i) / samples;
+        const v = rotate(latLonToVec(lat, lon), yaw, pitch);
+        if (v.z > 0) {
+          const p = project(v, R);
+          if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+          else          { ctx.lineTo(p.x, p.y); }
+        } else {
+          started = false;
+        }
+      }
+      ctx.stroke();
+    }
+
+    // Equator, faintly accented.
+    ctx.strokeStyle = 'rgba(200, 168, 75, 0.10)';
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i <= samples; i++) {
+      const lon = -180 + (360 * i) / samples;
+      const v = rotate(latLonToVec(0, lon), yaw, pitch);
+      if (v.z > 0) {
+        const p = project(v, R);
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else          { ctx.lineTo(p.x, p.y); }
+      } else {
+        started = false;
+      }
+    }
+    ctx.stroke();
+  }
+
+  function drawArcs() {
+    for (const arc of arcs) {
+      const segs = arc.segCount;
+      // Rotated endpoints for visibility test.
+      const aR = rotate(arc.a.vec, yaw, pitch);
+      const bR = rotate(arc.b.vec, yaw, pitch);
+      const bothBack = aR.z < -0.25 && bR.z < -0.25;
+      if (bothBack) continue;
+
+      // Draw path
+      ctx.strokeStyle = 'rgba(200, 160, 80, 0.10)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      let started = false;
+      const pts = new Array(segs + 1);
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const v = slerpLift(arc.a.vec, arc.b.vec, t, arc.lift);
+        const vr = rotate(v, yaw, pitch);
+        pts[i] = vr;
+        if (vr.z > -0.15) {
+          const p = project(vr, R);
+          if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+          else          { ctx.lineTo(p.x, p.y); }
+        } else {
+          started = false;
+        }
+      }
+      ctx.stroke();
+
+      // Particles
+      for (const prt of arc.particles) {
+        const tt = prt.t;
+        const v = slerpLift(arc.a.vec, arc.b.vec, tt, arc.lift);
+        const vr = rotate(v, yaw, pitch);
+        if (vr.z < -0.05) continue;
+        const p = project(vr, R);
+        // Fade near the limb.
+        const limbFade = Math.max(0, Math.min(1, (vr.z + 0.1) / 0.4));
+        const { r, g, b } = arc.tint;
+        // Soft halo
+        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 7);
+        halo.addColorStop(0.0, `rgba(${r}, ${g}, ${b}, ${0.55 * limbFade})`);
+        halo.addColorStop(1.0, `rgba(${r}, ${g}, ${b}, 0)`);
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+        ctx.fill();
+        // Core
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.95 * limbFade})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function drawCities() {
+    // Sort so rear cities draw first; front cities draw on top.
+    const rendered = [];
+    for (const c of CITIES) {
+      const vr = rotate(c.vec, yaw, pitch);
+      const p = project(vr, R);
+      rendered.push({ c, vr, p });
+    }
+    rendered.sort((a, b) => a.vr.z - b.vr.z);
+
+    for (const item of rendered) {
+      const { c, vr, p } = item;
+      if (vr.z <= -0.05) continue;
+      const limb = Math.max(0, Math.min(1, (vr.z + 0.05) / 0.5));
+      const tint = TINTS[c.tint];
+      const { r, g, b } = tint;
+      const isHovered = hoveredCity && hoveredCity.id === c.id;
+
+      // Outer glow
+      const haloR = isHovered ? 22 : 14;
+      const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, haloR);
+      halo.addColorStop(0.0, `rgba(${r}, ${g}, ${b}, ${(isHovered ? 0.55 : 0.35) * limb})`);
+      halo.addColorStop(1.0, `rgba(${r}, ${g}, ${b}, 0)`);
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, haloR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Core dot
+      const coreR = isHovered ? 3.6 : 2.6;
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.95 * limb})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, coreR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Inner cream pip
+      ctx.fillStyle = `rgba(244, 236, 216, ${0.9 * limb})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, coreR * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Label — only for front-facing cities.
+      if (vr.z > 0.1) {
+        ctx.save();
+        ctx.font = `500 ${isHovered ? 15 : 13}px "Cormorant Garamond", serif`;
+        ctx.textBaseline = 'middle';
+        // Place label to whichever side keeps it inside the globe frame
+        // and nudges outward based on the point's radial direction.
+        const rx = p.x - cx, ry = p.y - cy;
+        const rLen = Math.hypot(rx, ry) || 1;
+        const offset = 10;
+        const lx = p.x + (rx / rLen) * offset;
+        const ly = p.y + (ry / rLen) * offset;
+        const rightSide = rx >= 0;
+        ctx.textAlign = rightSide ? 'left' : 'right';
+        const tx = rightSide ? lx + 2 : lx - 2;
+        ctx.fillStyle = `rgba(244, 236, 216, ${(isHovered ? 0.95 : 0.78) * limb})`;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 6;
+        ctx.fillText(c.name, tx, ly);
+        ctx.restore();
+      }
+
+      if (isHovered) hoveredScreen = p;
+    }
+  }
+
+  // ---------- Hover detection ----------
+  function pickCity() {
+    if (!mouseCSS.inside || dragging) return null;
+    let best = null;
+    let bestDist = 18; // px
+    for (const c of CITIES) {
+      const vr = rotate(c.vec, yaw, pitch);
+      if (vr.z <= 0.02) continue;
+      const p = project(vr, R);
+      const dx = p.x - mouseCSS.x;
+      const dy = p.y - mouseCSS.y;
+      const d = Math.hypot(dx, dy);
+      if (d < bestDist) {
+        bestDist = d;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  function updatePanel() {
+    if (hoveredCity && hoveredScreen) {
+      panelEyebrow.textContent = hoveredCity.region;
+      panelName.textContent    = hoveredCity.name;
+      panelNote.textContent    = hoveredCity.note;
+      // Position in CSS pixels relative to the stage.
+      const rect = canvas.getBoundingClientRect();
+      const stageRect = document.getElementById('stage').getBoundingClientRect();
+      const left = rect.left - stageRect.left + hoveredScreen.x;
+      const top  = rect.top  - stageRect.top  + hoveredScreen.y;
+      panel.style.left = left + 'px';
+      panel.style.top  = top  + 'px';
+      panel.classList.add('visible');
+      canvas.style.cursor = dragging ? 'grabbing' : 'pointer';
+    } else {
+      panel.classList.remove('visible');
+      canvas.style.cursor = dragging ? 'grabbing' : 'grab';
+    }
+  }
+
+  // ---------- Animation loop ----------
+  let lastTime = performance.now();
+
+  function frame(now) {
+    const dt = Math.min(48, now - lastTime);
+    lastTime = now;
+
+    if (autoRotate && !dragging) {
+      yaw += autoSpeed * dt * 0.6;
+    }
+
+    // Advance particles
+    for (const arc of arcs) {
+      for (const prt of arc.particles) {
+        prt.t += prt.speed * dt;
+        if (prt.t > 1) prt.t -= 1;
+      }
+    }
+
+    // Pick hover (skip during drag).
+    const prevHover = hoveredCity;
+    hoveredCity = pickCity();
+    hoveredScreen = null;
+    if (hoveredCity && autoRotate) {
+      autoRotate = false;
+    }
+    if (!hoveredCity && !dragging && prevHover) {
+      scheduleResume();
+    }
+
+    // Draw
+    ctx.clearRect(0, 0, cssSize, cssSize);
+    drawAtmosphere();
+    drawGlobeFill();
+    drawGrid();
+    drawArcs();
+    drawCities();
+    updatePanel();
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+
+  // Hide the hint after any interaction.
+  setTimeout(() => {
+    if (!hintHidden) {
+      hint.style.opacity = '0';
+      hintHidden = true;
+    }
+  }, 7000);
+})();
+</script>
+</body>
+</html>
